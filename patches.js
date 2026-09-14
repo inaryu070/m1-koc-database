@@ -1571,3 +1571,72 @@ window.M1KOC_CHECKPOINT={...(window.M1KOC_CHECKPOINT||{}),version:'v218',focus:'
   let rt; addEventListener('resize',()=>{ clearTimeout(rt); rt=setTimeout(()=>drawAgencyPreview(agencyRows()),120); });
   window.M1KOC_HOME_EDITORIAL={version:'v230',sections:['stats','agency_feature','forecast_preview','backtest_preview','pickups']};
 })();
+
+/* v232 reference navigation / home shell */
+(()=>{
+  const body=document.body;
+  const menu=document.getElementById('refMobileMenu');
+  const menuBtn=document.getElementById('refMenuButton');
+  const navLinks=[...document.querySelectorAll('[data-ref-nav]')];
+  const sideLinks=[...document.querySelectorAll('.ref-nav [data-ref-nav]')];
+  const closeMenu=()=>{if(!menu||!menuBtn)return;menu.hidden=true;menuBtn.setAttribute('aria-expanded','false')};
+  if(menuBtn&&menu){menuBtn.addEventListener('click',()=>{const open=menu.hidden;menu.hidden=!open;menuBtn.setAttribute('aria-expanded',open?'true':'false')})}
+  const setActive=name=>sideLinks.forEach(a=>a.classList.toggle('active',a.dataset.refNav===name));
+  const scrollTo=id=>requestAnimationFrame(()=>document.querySelector(id)?.scrollIntoView({behavior:'smooth',block:'start'}));
+  const openHome=()=>{
+    body.classList.add('home-index');
+    window.M1KOC_PRIMARY_VIEW?.set?.('database',false);
+    setActive('home');
+    window.scrollTo({top:0,behavior:'smooth'});
+  };
+  const openDatabase=(target='teams')=>{
+    body.classList.remove('home-index');
+    window.M1KOC_PRIMARY_VIEW?.set?.('database',false);
+    setActive(target);
+    scrollTo(target==='about'?'#about':'#search');
+  };
+  const openDiscovery=(forecast=false)=>{
+    body.classList.remove('home-index');
+    window.M1KOC_PRIMARY_VIEW?.set?.('discovery',false);
+    setActive(forecast?'forecast':'discovery');
+    requestAnimationFrame(()=>{
+      if(forecast){
+        const b=document.querySelector('[data-discovery-tab="forecast"]');
+        if(b)b.click();
+      }
+      document.getElementById('discoveryRoot')?.scrollIntoView({behavior:'smooth',block:'start'});
+    });
+  };
+  const openVisuals=()=>{
+    body.classList.remove('home-index');
+    window.M1KOC_PRIMARY_VIEW?.set?.('agency',false);
+    setActive('visuals');
+    requestAnimationFrame(()=>{
+      const b=document.getElementById('agencyTabVisuals');
+      if(b)b.click();
+      document.getElementById('agencyVisuals')?.scrollIntoView({behavior:'smooth',block:'start'});
+    });
+  };
+  navLinks.forEach(a=>a.addEventListener('click',e=>{
+    e.preventDefault(); closeMenu();
+    const name=a.dataset.refNav;
+    if(name==='home')openHome();
+    else if(name==='teams')openDatabase('teams');
+    else if(name==='about')openDatabase('about');
+    else if(name==='forecast')openDiscovery(true);
+    else if(name==='discovery')openDiscovery(false);
+    else if(name==='visuals')openVisuals();
+  }));
+  // Home feature links should use the same shell navigation.
+  document.querySelectorAll('.edlink[data-go="agency"]').forEach(a=>a.addEventListener('click',e=>{e.preventDefault();openVisuals()}));
+  document.querySelectorAll('.edlink[data-go="discovery"]').forEach(a=>a.addEventListener('click',e=>{e.preventDefault();openDiscovery(true)}));
+  // Reference screenshot represents the default landing page.
+  if(!['#agency','#discovery'].includes(location.hash)){
+    body.classList.add('home-index');
+    setActive('home');
+  }else{
+    body.classList.remove('home-index');
+    setActive(location.hash==='#agency'?'visuals':'discovery');
+  }
+  window.M1KOC_REFERENCE_SHELL={version:'v232',home:openHome,teams:()=>openDatabase('teams'),visuals:openVisuals,discovery:()=>openDiscovery(false),forecast:()=>openDiscovery(true)};
+})();
