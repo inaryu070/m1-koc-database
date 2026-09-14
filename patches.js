@@ -892,10 +892,13 @@ document.getElementById('agencyPowerCsv').addEventListener('click',()=>{const ro
 let rz;addEventListener('resize',()=>{clearTimeout(rz);rz=setTimeout(()=>{drawMap();drawDNA()},160)});
 // Keep this panel synced with scoring-mode changes and ordinary renders without coupling it to the main period selector.
 const wireAgencyRows=()=>{document.querySelectorAll('#agencyTableWrap tbody tr').forEach(tr=>{tr.classList.add('agencyrowlink');tr.title='この事務所の年度推移を見る';tr.onclick=()=>{const a=tr.cells?.[0]?.querySelector('strong')?.textContent?.trim();if(!a||![...agencyEl.options].some(o=>o.value===a))return;agencyEl.value=a;drawDNA();evo.scrollIntoView({behavior:'smooth',block:'start'})}})};
-const oldAgencyRender=renderAgencyDashboard;renderAgencyDashboard=function(filtered){oldAgencyRender(filtered);requestAnimationFrame(()=>{renderEvolution();wireAgencyRows()})};
-window.M1KOC_AGENCY_EVOLUTION={version:'v212',ranges,eras,method:'M-1/KOC base score by year; historical affiliation is reference-only'};
+let agencyEvolutionDirty=true;
+const agencyEvolutionVisible=()=>{const el=document.getElementById('agencyEvolution');return !!el&&!el.hidden};
+const oldAgencyRender=renderAgencyDashboard;renderAgencyDashboard=function(filtered){oldAgencyRender(filtered);agencyEvolutionDirty=true;requestAnimationFrame(()=>{wireAgencyRows();if(agencyEvolutionVisible()){renderEvolution();agencyEvolutionDirty=false}})};
+window.M1KOC_AGENCY_EVOLUTION={version:'v216',ranges,eras,method:'M-1/KOC base score by year; historical affiliation is reference-only'};
 window.M1KOC_CHECKPOINT={...(window.M1KOC_CHECKPOINT||{}),version:'v212',focus:'final audit + agency evolution / yearly M-1 KOC power'};
-renderEvolution();wireAgencyRows();
+window.M1KOC_RENDER_AGENCY_EVOLUTION=renderEvolution;
+wireAgencyRows();
 })();
 
 /* ---- retained patch boundary ---- */
@@ -927,3 +930,36 @@ window.M1KOC_PUBLIC_HARDENING={version:'v214',checked_at:'2026-09-14',items:['og
 
 /* v215 agency coverage fix */
 window.M1KOC_AGENCY_COVERAGE_FIX={version:'v215',checked_at:'2026-09-14',method:'agency power uses all agency_verified records; activity status narrows only when explicitly filtered'};
+
+
+/* v216 agency tabs + lazy evolution rendering */
+(()=>{
+  const tabs=document.getElementById('agencyTabs');
+  const power=document.getElementById('agencyDashboard');
+  const evolution=document.getElementById('agencyEvolution');
+  if(!tabs||!power||!evolution)return;
+  const buttons=[...tabs.querySelectorAll('[data-agency-tab]')];
+  const setTab=(name,{scroll=false}={})=>{
+    const evo=name==='evolution';
+    power.hidden=evo;
+    evolution.hidden=!evo;
+    for(const b of buttons){const on=b.dataset.agencyTab===name;b.classList.toggle('on',on);b.setAttribute('aria-selected',on?'true':'false')}
+    try{sessionStorage.setItem('m1kocAgencyTab',name)}catch(e){}
+    if(evo&&typeof window.M1KOC_RENDER_AGENCY_EVOLUTION==='function'){requestAnimationFrame(()=>window.M1KOC_RENDER_AGENCY_EVOLUTION())}
+    if(scroll)tabs.scrollIntoView({behavior:'smooth',block:'start'});
+  };
+  tabs.addEventListener('click',e=>{const b=e.target.closest('[data-agency-tab]');if(b)setTab(b.dataset.agencyTab)});
+  let initial='power';try{const saved=sessionStorage.getItem('m1kocAgencyTab');if(saved==='evolution')initial=saved}catch(e){}
+  setTab(initial);
+  // Expose for agency-row click and external navigation.
+  window.M1KOC_SET_AGENCY_TAB=(name,opts)=>setTab(name,opts||{});
+  // Rewire table rows after every dashboard update without eagerly drawing evolution charts.
+  const rewire=()=>document.querySelectorAll('#agencyTableWrap tbody tr').forEach(tr=>{
+    tr.classList.add('agencyrowlink');tr.title='この事務所の年度推移を見る';
+    tr.onclick=()=>{const a=tr.cells?.[0]?.querySelector('strong')?.textContent?.trim();const sel=document.getElementById('agencyTrendSelect');if(!a||!sel)return;setTab('evolution',{scroll:true});requestAnimationFrame(()=>{if(typeof window.M1KOC_RENDER_AGENCY_EVOLUTION==='function')window.M1KOC_RENDER_AGENCY_EVOLUTION();if([...sel.options].some(o=>o.value===a)){sel.value=a;if(typeof window.M1KOC_RENDER_AGENCY_EVOLUTION==='function')window.M1KOC_RENDER_AGENCY_EVOLUTION()}})};
+  });
+  const table=document.getElementById('agencyTableWrap');if(table)new MutationObserver(rewire).observe(table,{childList:true,subtree:true});rewire();
+  window.M1KOC_UI_OPTIMIZATION={version:'v216',agency_tabs:true,lazy_agency_evolution:true,initial_cards:{mobile:32,desktop:80}};
+})();
+
+window.M1KOC_CHECKPOINT={...(window.M1KOC_CHECKPOINT||{}),version:'v216',focus:'agency tabs + lazy evolution + lighter initial list render',checked_at:'2026-09-14'};

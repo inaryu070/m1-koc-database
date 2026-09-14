@@ -64,6 +64,14 @@ input,select{background:var(--panel);border:1px solid var(--line);color:white;bo
 /* v6.2 career / agency */
 .careerstrip{display:flex;gap:6px;flex-wrap:wrap;margin:8px 0 2px}.careerflag{font-size:9px;padding:5px 7px;border:1px solid #33353a;border-radius:3px;color:#aeb2ba;background:#111214}.careerflag.young{border-color:rgba(223,188,104,.45);color:#e4c878}.careerflag.veteran{border-color:rgba(185,164,255,.35);color:#c8baff}.careerflag.agency{border-color:rgba(107,165,223,.35);color:#9bc3eb}.careerflag.status-active{border-color:rgba(120,190,130,.34);color:#acd6b2}.careerflag.status-dissolved{border-color:rgba(239,90,84,.35);color:#ef9692}.careerflag.status-unknown{border-color:#3a3b40;color:#8d9097}.careerflag.status-mixed{border-color:rgba(223,188,104,.42);color:#e4c878}.agencydash{margin:16px 0 28px;padding:18px;border:1px solid #323338;border-radius:7px;background:linear-gradient(145deg,#141416,#0f0f11)}.agencyhead{display:flex;justify-content:space-between;gap:18px;align-items:flex-end;margin-bottom:12px}.agencyhead h2{margin:0;color:#fff;font-size:18px}.agencyhead p{margin:5px 0 0;color:#777980;font-size:9px}.agencycov{font-size:10px;color:#c6c8cc}.agencycov b{color:#e0c67f}.agencytable{width:100%;border-collapse:collapse;font-size:10px}.agencytable th,.agencytable td{padding:9px 7px;border-bottom:1px solid #26272b;text-align:right}.agencytable th:first-child,.agencytable td:first-child{text-align:left}.agencytable th{color:#74767c;font-weight:500}.agencytable td{color:#cfd1d5}.agencytable td strong{color:#fff}.agencybar{display:inline-block;height:5px;min-width:2px;border-radius:3px;background:#6d6e74;vertical-align:middle;margin-left:7px}.agencywarn{margin-top:10px;color:#73757b;font-size:9px;line-height:1.6}.agencyfilter{min-width:180px}.careerlegend{margin-top:8px;color:#6f7176;font-size:9px;line-height:1.55}
 @media(max-width:560px){.agencydash{padding:12px;overflow:auto}.agencyhead{align-items:flex-start;flex-direction:column}.agencytable{min-width:560px}.finderrow.careerrow{grid-template-columns:1fr 1fr}.finderrow.careerrow .finderlabel{grid-column:1/-1}.agencyfilter{min-width:0}}
+
+/* v216 compact agency tabs + lighter initial render */
+.card{content-visibility:auto;contain-intrinsic-size:320px}.agencydash,.agencyevo{content-visibility:auto;contain-intrinsic-size:700px}
+.agencytabs{display:flex;gap:6px;margin:24px 0 8px;padding:4px;border:1px solid #2b2c31;border-radius:10px;background:#101114;position:sticky;top:8px;z-index:12;backdrop-filter:blur(10px)}
+.agencytab{appearance:none;border:0;background:transparent;color:#777b84;font:inherit;font-size:10px;letter-spacing:.08em;padding:9px 14px;border-radius:7px;cursor:pointer}
+.agencytab:hover{color:#d5d7dc;background:#17181c}.agencytab.on{color:#f1f1f2;background:#232429;box-shadow:inset 0 0 0 1px #35373d}
+.agencypanel[hidden]{display:none!important}
+@media(max-width:560px){.agencytabs{margin-top:18px;top:6px}.agencytab{flex:1;padding:10px 8px;font-size:9px}.agencydash,.agencyevo{margin-top:8px}}
 </style>
 <meta name="data-release" content="public-ui-2026-09-14-v214">
 
@@ -300,7 +308,7 @@ button,select,input{touch-action:manipulation}
 
 
 
-<div class="release-note" aria-label="データ更新情報"><span><b>DATA v215</b></span><span>総収録 1,747組</span><span>所属確認 1,742組 / 99.7%</span><span>所属UNRESOLVED 5組</span><span>構造監査 0件</span><span>KOC 2026: 9/10決勝・敗者復活発表反映</span></div>
+<div class="release-note" aria-label="データ更新情報"><span><b>DATA v216</b></span><span>総収録 1,747組</span><span>所属確認 1,742組 / 99.7%</span><span>所属UNRESOLVED 5組</span><span>構造監査 0件</span><span>KOC 2026: 9/10決勝・敗者復活発表反映</span></div>
 
 <div class="career-tier-note" style="margin-top:12px;padding:12px 14px;border:1px solid var(--line);border-radius:12px;color:#777b84;font-size:10px;line-height:1.7">
   若手判定は<b style="color:#ddd">コンビ結成年</b>を主指標にしています。
@@ -310,10 +318,14 @@ button,select,input{touch-action:manipulation}
 
 </section>
 <section class="analytics" id="analytics"><div class="analyticshead"><div><h2>ANALYSIS DASHBOARD</h2><p>現在の集計期間・得点方法・ランキング対象・検索条件に連動します。</p></div><div class="chartsummary" id="chartSummary"></div></div><div class="chartgrid"><div class="chartbox"><div class="charttitle"><b>M-1 × KOC 勢力図</b><span>点を押すと詳細を表示</span></div><canvas class="chartcanvas" id="scatterChart" aria-label="M-1ポイントとKOCポイントの散布図"></canvas><div class="charttip" id="chartTip"></div><div class="chartlegend"><span><i style="background:#ef5a54"></i>M-1型</span><span><i style="background:#6ba5df"></i>KOC型</span><span><i style="background:#dfbc68"></i>二刀流</span></div></div><div class="chartbox"><div class="charttitle"><b>拡張総合点 TOP20</b><span id="topChartLabel">選択期間ランキング</span></div><canvas class="chartcanvas" id="topChart" aria-label="拡張総合点上位20組の横棒グラフ"></canvas></div></div></section>
-<section class="agencydash" id="agencyDashboard"><div class="agencyhead"><div><h2>AGENCY POWER / M-1 × KOC</h2><p>M-1／KOC本体点を事務所別に集計。所属確認済み全組を母集団とし、活動状態はフィルターで明示指定した場合のみ絞り込みます。</p></div><div class="agencycov" id="agencyCoverage"></div></div><div id="agencyTableWrap"></div><div class="agencywarn">※ POWERは所属確認済み全組を対象にしたM-1／KOC本体点（3回戦1・QF2・SF3・決勝5・優勝15）の合計。外部賞レースは含めません。所属はDB内の確認済み所属を使用し、複数所属は独立カテゴリとして重複加算しません。過去年の大会当時所属が全件で年次管理されているわけではないため、年別の事務所シェアは参考値としてご覧ください。</div></section>
+<div class="agencytabs" id="agencyTabs" role="tablist" aria-label="事務所分析の切り替え">
+  <button class="agencytab on" id="agencyTabPower" type="button" role="tab" aria-selected="true" aria-controls="agencyDashboard" data-agency-tab="power">POWER</button>
+  <button class="agencytab" id="agencyTabEvolution" type="button" role="tab" aria-selected="false" aria-controls="agencyEvolution" data-agency-tab="evolution">EVOLUTION</button>
+</div>
+<section class="agencydash agencypanel" id="agencyDashboard" role="tabpanel" aria-labelledby="agencyTabPower"><div class="agencyhead"><div><h2>AGENCY POWER / M-1 × KOC</h2><p>M-1／KOC本体点を事務所別に集計。所属確認済み全組を母集団とし、活動状態はフィルターで明示指定した場合のみ絞り込みます。</p></div><div class="agencycov" id="agencyCoverage"></div></div><div id="agencyTableWrap"></div><div class="agencywarn">※ POWERは所属確認済み全組を対象にしたM-1／KOC本体点（3回戦1・QF2・SF3・決勝5・優勝15）の合計。外部賞レースは含めません。所属はDB内の確認済み所属を使用し、複数所属は独立カテゴリとして重複加算しません。過去年の大会当時所属が全件で年次管理されているわけではないため、年別の事務所シェアは参考値としてご覧ください。</div></section>
 
 
-<section class="agencyevo" id="agencyEvolution">
+<section class="agencyevo agencypanel" id="agencyEvolution" role="tabpanel" aria-labelledby="agencyTabEvolution" hidden>
   <div class="evohead">
     <div>
       <span class="evokicker">AGENCY EVOLUTION</span>
