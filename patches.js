@@ -938,18 +938,23 @@ window.M1KOC_AGENCY_COVERAGE_FIX={version:'v215',checked_at:'2026-09-14',method:
   const power=document.getElementById('agencyDashboard');
   const evolution=document.getElementById('agencyEvolution');
   if(!tabs||!power||!evolution)return;
+  const tournament=document.getElementById('agencyTournament');
+  const insights=document.getElementById('agencyInsights');
+  const visuals=document.getElementById('agencyVisuals');
   const buttons=[...tabs.querySelectorAll('[data-agency-tab]')];
   const setTab=(name,{scroll=false}={})=>{
-    const evo=name==='evolution';
-    power.hidden=evo;
-    evolution.hidden=!evo;
+    const panels={power,evolution,tournament,insights,visuals};
+    for(const [key,panel] of Object.entries(panels)){if(panel)panel.hidden=key!==name}
     for(const b of buttons){const on=b.dataset.agencyTab===name;b.classList.toggle('on',on);b.setAttribute('aria-selected',on?'true':'false')}
     try{sessionStorage.setItem('m1kocAgencyTab',name)}catch(e){}
-    if(evo&&typeof window.M1KOC_RENDER_AGENCY_EVOLUTION==='function'){requestAnimationFrame(()=>window.M1KOC_RENDER_AGENCY_EVOLUTION())}
+    if(name==='evolution'&&typeof window.M1KOC_RENDER_AGENCY_EVOLUTION==='function'){requestAnimationFrame(()=>window.M1KOC_RENDER_AGENCY_EVOLUTION())}
+    if(name==='tournament'&&typeof window.M1KOC_RENDER_AGENCY_TOURNAMENT==='function'){requestAnimationFrame(()=>window.M1KOC_RENDER_AGENCY_TOURNAMENT())}
+    if(name==='insights'&&typeof window.M1KOC_RENDER_AGENCY_INSIGHTS==='function'){requestAnimationFrame(()=>window.M1KOC_RENDER_AGENCY_INSIGHTS())}
+    if(name==='visuals'&&typeof window.M1KOC_RENDER_AGENCY_VISUALS==='function'){requestAnimationFrame(()=>window.M1KOC_RENDER_AGENCY_VISUALS())}
     if(scroll)tabs.scrollIntoView({behavior:'smooth',block:'start'});
   };
   tabs.addEventListener('click',e=>{const b=e.target.closest('[data-agency-tab]');if(b)setTab(b.dataset.agencyTab)});
-  let initial='power';try{const saved=sessionStorage.getItem('m1kocAgencyTab');if(saved==='evolution')initial=saved}catch(e){}
+  let initial='power';try{const saved=sessionStorage.getItem('m1kocAgencyTab');if(['power','evolution','tournament','insights','visuals'].includes(saved))initial=saved}catch(e){}
   setTab(initial);
   // Expose for agency-row click and external navigation.
   window.M1KOC_SET_AGENCY_TAB=(name,opts)=>setTab(name,opts||{});
@@ -971,16 +976,19 @@ window.M1KOC_CHECKPOINT={...(window.M1KOC_CHECKPOINT||{}),version:'v218',focus:'
   if(!tabs)return;
   const buttons=[...tabs.querySelectorAll('[data-primary-target]')];
   const dbSelectors=['.nextstar.nextstar-v2','.featurebar','#search','.sectionlabel','.stats','#grid','#comparebar','#about','#analytics'];
-  const agencySelectors=['#agencyTabs','#agencyDashboard','#agencyEvolution'];
+  const agencySelectors=['#agencyTabs','#agencyDashboard','#agencyEvolution','#agencyTournament','#agencyInsights','#agencyVisuals'];
+  const discoverySelectors=['#discoveryRoot'];
   const els=(selectors)=>selectors.flatMap(sel=>[...document.querySelectorAll(sel)]);
-  const dbEls=els(dbSelectors), agencyEls=els(agencySelectors);
+  const dbEls=els(dbSelectors), agencyEls=els(agencySelectors), discoveryEls=els(discoverySelectors);
   const setHidden=(list,hidden)=>list.forEach(el=>el.classList.toggle('primary-view-hidden',hidden));
   const setPrimary=(name,scroll=true)=>{
-    const agency=name==='agency';
+    const agency=name==='agency', discovery=name==='discovery', database=name==='database';
     document.body.classList.toggle('primary-agency',agency);
-    document.body.classList.toggle('primary-database',!agency);
-    setHidden(dbEls,agency);
+    document.body.classList.toggle('primary-database',database);
+    document.body.classList.toggle('primary-discovery',discovery);
+    setHidden(dbEls,!database);
     setHidden(agencyEls,!agency);
+    setHidden(discoveryEls,!discovery);
     for(const b of buttons){
       const on=b.dataset.primaryTarget===name;
       b.classList.toggle('on',on);
@@ -993,7 +1001,7 @@ window.M1KOC_CHECKPOINT={...(window.M1KOC_CHECKPOINT||{}),version:'v218',focus:'
         try{window.dispatchEvent(new Event('resize'))}catch(_e){}
       });
     }
-    try{history.replaceState(null,'',agency?'#agency':'#database')}catch(_e){}
+    try{history.replaceState(null,'',agency?'#agency':discovery?'#discovery':'#database')}catch(_e){}
     if(scroll)document.getElementById('primaryTabs')?.scrollIntoView({behavior:'smooth',block:'start'});
   };
   tabs.addEventListener('click',e=>{
@@ -1002,6 +1010,564 @@ window.M1KOC_CHECKPOINT={...(window.M1KOC_CHECKPOINT||{}),version:'v218',focus:'
   });
   document.querySelector('.sitehead .nav a[href="#agencyTabs"]')?.addEventListener('click',e=>{e.preventDefault();setPrimary('agency',true)});
   document.querySelector('.sitehead .nav a[href="#search"]')?.addEventListener('click',e=>{e.preventDefault();setPrimary('database',true)});
-  setPrimary(location.hash==='#agency'?'agency':'database',false);
-  window.M1KOC_PRIMARY_VIEW={set:setPrimary,version:'v218'};
+  document.querySelector('.sitehead .nav a[href="#discoveryRoot"]')?.addEventListener('click',e=>{e.preventDefault();setPrimary('discovery',true)});
+  setPrimary(location.hash==='#agency'?'agency':location.hash==='#discovery'?'discovery':'database',false);
+  window.M1KOC_PRIMARY_VIEW={set:setPrimary,version:'v224'};
+})();
+
+
+/* v219 tournament-by-tournament agency balance */
+(()=>{
+  const root=document.getElementById('agencyTournament');
+  if(!root)return;
+  const contestEl=document.getElementById('tourContest'),yearEl=document.getElementById('tourYear'),minEl=document.getElementById('tourMinN');
+  const summary=document.getElementById('tourSummary'),tableWrap=document.getElementById('tourTableWrap'),canvas=document.getElementById('tourScatter'),tip=document.getElementById('tourTip'),mapLabel=document.getElementById('tourMapLabel');
+  const stageLabel=v=>/優勝/.test(v)?'優勝':/^決勝/.test(v)?'決勝':/準決勝/.test(v)?'準決勝':/準々決勝/.test(v)?'準々決勝':/3回戦|３回戦/.test(v)?'3回戦':String(v||'—');
+  const score=v=>({r3:1,qf:2,sf:3,final:5,win:15})[stageKey(v)]||0;
+  const contestYears=c=>[...new Set(DB.flatMap(d=>Object.keys((c==='m1'?d.m1:d.koc)||{})).map(Number).filter(Boolean))].sort((a,b)=>b-a);
+  function fillYears(){const years=contestYears(contestEl.value),keep=Number(yearEl.value);yearEl.innerHTML=years.map(y=>`<option value="${y}">${y}</option>`).join('');if(years.includes(keep))yearEl.value=String(keep);else if(years.length)yearEl.value=String(years[0]);}
+  function rows(){
+    const c=contestEl.value,y=String(yearEl.value),by=new Map();
+    for(const d of DB){if(!d.agency_verified||!d.agency)continue;const result=(c==='m1'?d.m1:d.koc)?.[y];if(!result)continue;const a=agencyCanonical(d);if(!by.has(a))by.set(a,[]);by.get(a).push({d,result,pt:score(result)});}
+    const totalPts=[...by.values()].flat().reduce((s,x)=>s+x.pt,0);
+    return [...by.entries()].map(([agency,items])=>{
+      const total=items.reduce((s,x)=>s+x.pt,0),n=items.length,avg=n?total/n:0,sf=items.filter(x=>rank(x.result)>=70).length;
+      const top=[...items].sort((a,b)=>rank(b.result)-rank(a.result)||b.pt-a.pt||a.d.name.localeCompare(b.d.name,'ja'))[0];
+      return{agency,n,total,avg,sfRate:n?sf/n*100:0,share:totalPts?total/totalPts*100:0,topName:top?.d.name||'—',topStage:stageLabel(top?.result),topRank:rank(top?.result)||0};
+    }).sort((a,b)=>b.avg-a.avg||b.total-a.total||b.n-a.n||a.agency.localeCompare(b.agency,'ja'));
+  }
+  let hits=[];
+  function draw(data){
+    const minN=Number(minEl.value),shown=data.filter(x=>x.n>=minN),r=canvas.getBoundingClientRect(),dpr=Math.min(2,window.devicePixelRatio||1),w=Math.max(300,r.width||300),h=Math.max(250,r.height||300);canvas.width=w*dpr;canvas.height=h*dpr;const ctx=canvas.getContext('2d');ctx.setTransform(dpr,0,0,dpr,0,0);ctx.clearRect(0,0,w,h);hits=[];
+    const pad={l:42,r:18,t:18,b:34},pw=w-pad.l-pad.r,ph=h-pad.t-pad.b,maxN=Math.max(minN,...shown.map(x=>x.n),1),maxA=Math.max(1,...shown.map(x=>x.avg));ctx.font='8px Arial';ctx.textBaseline='middle';
+    for(let i=0;i<=4;i++){const yy=pad.t+ph-ph*i/4;ctx.strokeStyle='#25262b';ctx.beginPath();ctx.moveTo(pad.l,yy);ctx.lineTo(w-pad.r,yy);ctx.stroke();ctx.fillStyle='#62656c';ctx.textAlign='right';ctx.fillText((maxA*i/4).toFixed(1),pad.l-6,yy)}
+    for(let i=0;i<=4;i++){const xx=pad.l+pw*i/4;ctx.strokeStyle='#202126';ctx.beginPath();ctx.moveTo(xx,pad.t);ctx.lineTo(xx,pad.t+ph);ctx.stroke();ctx.fillStyle='#62656c';ctx.textAlign='center';ctx.fillText(String(Math.round(maxN*i/4)),xx,h-pad.b+13)}
+    ctx.fillStyle='#777a81';ctx.textAlign='left';ctx.fillText('AVG',4,10);ctx.textAlign='right';ctx.fillText('n',w-5,h-8);
+    const labels=new Set(shown.slice(0,8).map(x=>x.agency));
+    shown.forEach((x,i)=>{const cx=pad.l+(x.n/maxN)*pw,cy=pad.t+ph-(x.avg/maxA)*ph,rr=Math.max(3,Math.min(8,3+Math.sqrt(x.total)*.7));ctx.fillStyle=i<3?'rgba(223,188,104,.72)':'rgba(174,177,184,.48)';ctx.strokeStyle=i<3?'rgba(223,188,104,.95)':'rgba(210,212,218,.42)';ctx.beginPath();ctx.arc(cx,cy,rr,0,Math.PI*2);ctx.fill();ctx.stroke();hits.push({x:cx,y:cy,r:rr+7,row:x});if(labels.has(x.agency)){ctx.fillStyle='#aeb0b6';ctx.font='8px Arial';ctx.textAlign='left';ctx.fillText(x.agency,cx+rr+3,cy)}});
+  }
+  function render(){
+    const data=rows(),minN=Number(minEl.value),qualified=data.filter(x=>x.n>=minN),below=data.filter(x=>x.n<minN),totalN=data.reduce((s,x)=>s+x.n,0),totalPts=data.reduce((s,x)=>s+x.total,0),leader=qualified[0],volume=[...data].sort((a,b)=>b.n-a.n||b.total-a.total)[0],power=[...data].sort((a,b)=>b.total-a.total||b.n-a.n)[0],concentration=power?power.share:0;
+    summary.innerHTML=`<div class="evosum"><span>${contestEl.value==='m1'?'M-1':'KOC'} ${yearEl.value}</span><b>${totalN}組</b></div><div class="evosum"><span>QUALITY LEADER</span><b>${leader?esc(leader.agency)+' / '+leader.avg.toFixed(2):'—'}</b></div><div class="evosum"><span>VOLUME LEADER</span><b>${volume?esc(volume.agency)+' / n='+volume.n:'—'}</b></div><div class="evosum"><span>TOTAL POWER</span><b>${power?esc(power.agency)+' / '+power.total+'pt':'—'}</b></div><div class="evosum"><span>TOP SHARE</span><b>${concentration.toFixed(1)}%</b></div><div class="evosum"><span>MIN SAMPLE</span><b>n ≥ ${minN}</b></div>`;
+    const table=(arr,belowFlag=false)=>arr.map((x,i)=>`<tr class="${belowFlag?'below':i<3?'top':''}"><td class="rank">${belowFlag?'—':i+1}</td><td><strong>${esc(x.agency)}</strong>${x.n>=minN?'<span class="tourbadge qual">QUAL</span>':''}</td><td class="avg"><strong>${x.avg.toFixed(2)}</strong></td><td>${x.total}</td><td>${x.n}</td><td>${x.sfRate.toFixed(1)}%</td><td class="share">${x.share.toFixed(1)}%</td><td><span class="tourtopname" title="${esc(x.topName)}">${esc(x.topName)}</span><span class="agencysub">${x.topStage}</span></td></tr>`).join('');
+    tableWrap.innerHTML=`<div class="tour-subhead"><b>ランキング対象 ${qualified.length}事務所</b><span>AVG / TOTAL / n / SF+ / SHARE</span></div><table class="tourtable"><thead><tr><th>#</th><th>事務所</th><th>AVG</th><th>TOTAL</th><th>n</th><th>SF+率</th><th>SHARE</th><th>TOP</th></tr></thead><tbody>${table(qualified)}${below.length?`<tr><td colspan="8" style="padding:12px 6px 5px;color:#666970;text-align:left">参考値：n &lt; ${minN}</td></tr>${table(below,true)}`:''}</tbody></table>`;
+    mapLabel.textContent=`n ≥ ${minN}`;draw(data);
+  }
+  function hitAt(e){const r=canvas.getBoundingClientRect(),x=e.clientX-r.left,y=e.clientY-r.top;return hits.find(p=>Math.hypot(x-p.x,y-p.y)<=p.r)}
+  canvas.addEventListener('pointermove',e=>{const p=hitAt(e);if(!p){tip.classList.remove('show');return}const b=canvas.parentElement.getBoundingClientRect();tip.innerHTML=`<b>${esc(p.row.agency)}</b><br>AVG ${p.row.avg.toFixed(2)} ／ TOTAL ${p.row.total}pt<br>n=${p.row.n} ／ SF+ ${p.row.sfRate.toFixed(1)}%`;tip.style.left=Math.min(e.clientX-b.left+10,b.width-190)+'px';tip.style.top=(e.clientY-b.top+8)+'px';tip.classList.add('show')});canvas.addEventListener('pointerleave',()=>tip.classList.remove('show'));
+  contestEl.addEventListener('change',()=>{fillYears();render()});yearEl.addEventListener('change',render);minEl.addEventListener('change',render);
+  document.getElementById('tourCsv').addEventListener('click',()=>{const data=rows(),minN=Number(minEl.value),out=[['大会','年','事務所','AVG_POINT','TOTAL_POINT','n','SF_PLUS_RATE','POINT_SHARE','TOP_TEAM','TOP_STAGE','QUALIFIED']];for(const x of data)out.push([contestEl.value==='m1'?'M-1':'KOC',yearEl.value,x.agency,x.avg.toFixed(3),x.total,x.n,x.sfRate.toFixed(1),x.share.toFixed(1),x.topName,x.topStage,x.n>=minN?'YES':'NO']);const csv=out.map(r=>r.map(v=>`"${String(v??'').replaceAll('"','""')}"`).join(',')).join('\r\n'),blob=new Blob(['\uFEFF'+csv],{type:'text/csv'}),u=URL.createObjectURL(blob),a=document.createElement('a');a.href=u;a.download=`agency_tournament_${contestEl.value}_${yearEl.value}_v219.csv`;a.click();URL.revokeObjectURL(u)});
+  let rt;addEventListener('resize',()=>{if(root.hidden)return;clearTimeout(rt);rt=setTimeout(render,140)});
+  fillYears();if(contestYears('m1').includes(2025))yearEl.value='2025';render();
+  window.M1KOC_RENDER_AGENCY_TOURNAMENT=render;
+  window.M1KOC_AGENCY_TOURNAMENT={version:'v219',default_min_n:5,thresholds:[3,5,10],metrics:['avg_point','total_point','n','sf_plus_rate','point_share','top_team']};
+  window.M1KOC_CHECKPOINT={...(window.M1KOC_CHECKPOINT||{}),version:'v219',focus:'agency tournament balance / quality x volume',checked_at:'2026-09-14'};
+})();
+
+
+/* v220 agency archetype / depth / breakthrough / retention insights */
+(()=>{
+  const root=document.getElementById('agencyInsights');
+  if(!root)return;
+  const rangeEl=document.getElementById('insightRange'),minEl=document.getElementById('insightMinN'),summary=document.getElementById('insightSummary'),tableWrap=document.getElementById('insightTableWrap'),cards=document.getElementById('archetypeCards'),canvas=document.getElementById('insightScatter'),tip=document.getElementById('insightTip');
+  const baseScore=v=>({r3:1,qf:2,sf:3,final:5,win:15})[stageKey(v)]||0;
+  const bounds=()=>rangeEl.value==='modern'?[2015,2025]:rangeEl.value==='both'?[2008,2025]:[2001,2025];
+  const inRange=y=>{const [a,b]=bounds();return +y>=a&&+y<=b};
+  const quantile=(arr,q)=>{const a=arr.filter(Number.isFinite).sort((x,y)=>x-y);if(!a.length)return 0;const i=(a.length-1)*q,lo=Math.floor(i),hi=Math.ceil(i);return lo===hi?a[lo]:a[lo]*(hi-i)+a[hi]*(i-lo)};
+  const yearsByContest=c=>new Set(DB.flatMap(d=>Object.keys((c==='m1'?d.m1:d.koc)||{})).map(Number).filter(Boolean));
+  const globalYears={m1:yearsByContest('m1'),koc:yearsByContest('koc')};
+  function data(){
+    const by=new Map();
+    for(const d of DB){
+      if(!d.agency_verified||!d.agency)continue;
+      const agency=agencyCanonical(d);if(!by.has(agency))by.set(agency,[]);by.get(agency).push(d);
+    }
+    const out=[];
+    for(const [agency,teams] of by){
+      let m1=0,koc=0,total=0,activeTeams=0,breakthroughTeams=0,retained=0,retEligible=0,cross=0,acePts=0;const teamPts=[];
+      for(const d of teams){
+        let tm=0,tk=0,tp=0,hasAny=false;
+        for(const [y,v] of Object.entries(d.m1||{})){if(inRange(y)){const pt=baseScore(v);tm+=pt;tp+=pt;if(pt)hasAny=true}}
+        for(const [y,v] of Object.entries(d.koc||{})){if(inRange(y)){const pt=baseScore(v);tk+=pt;tp+=pt;if(pt)hasAny=true}}
+        if(!hasAny)continue;
+        activeTeams++;m1+=tm;koc+=tk;total+=tp;teamPts.push(tp);if(tm>0&&tk>0)cross++;
+        let firstSf=Infinity;
+        for(const c of ['m1','koc'])for(const [y,v] of Object.entries((c==='m1'?d.m1:d.koc)||{})){if(rank(v)>=70)firstSf=Math.min(firstSf,+y)}
+        if(Number.isFinite(firstSf)&&inRange(firstSf))breakthroughTeams++;
+        for(const c of ['m1','koc']){
+          const obj=(c==='m1'?d.m1:d.koc)||{};
+          for(const [ys,v] of Object.entries(obj)){
+            const y=+ys;if(!inRange(y)||rank(v)<50||!globalYears[c].has(y+1)||!inRange(y+1))continue;
+            retEligible++;if(rank(obj[String(y+1)])>=50)retained++;
+          }
+        }
+      }
+      acePts=teamPts.length?Math.max(...teamPts):0;
+      if(!activeTeams)continue;
+      const avg=total/activeTeams,ace=total?acePts/total*100:0,depth=100-ace,breakRate=breakthroughTeams/activeTeams*100,retention=retEligible?retained/retEligible*100:0,crossRate=cross/activeTeams*100;
+      const dnaShare=total?m1/total*100:50,dna=dnaShare>=70?'漫才特化型':dnaShare<=30?'コント特化型':'二刀流型';
+      out.push({agency,n:activeTeams,total,avg,m1,koc,ace,depth,breakthroughTeams,breakRate,retained,retEligible,retention,cross,crossRate,dna});
+    }
+    const minN=+minEl.value,qualified=out.filter(x=>x.n>=minN),src=qualified.length?qualified:out;
+    const t={n50:quantile(src.map(x=>x.n),.5),n75:quantile(src.map(x=>x.n),.75),avg75:quantile(src.map(x=>x.avg),.75),depth75:quantile(src.map(x=>x.depth),.75),ace75:quantile(src.map(x=>x.ace),.75),break75:quantile(src.map(x=>x.breakRate),.75),ret75:quantile(src.filter(x=>x.retEligible>=3).map(x=>x.retention),.75)};
+    for(const x of out){
+      let a='バランス型';
+      if(x.n>=t.n75&&x.depth>=t.depth75)a='大型層厚型';
+      else if(x.avg>=t.avg75&&x.n<=t.n50)a='少数精鋭型';
+      else if(x.breakthroughTeams>=2&&x.breakRate>0&&x.breakRate>=t.break75)a='新星供給型';
+      else if(x.retEligible>=3&&x.retention>0&&x.retention>=t.ret75)a='安定供給型';
+      else if(x.total>0&&x.ace>=t.ace75)a='エース牽引型';
+      x.archetype=a;
+    }
+    return out.sort((a,b)=>b.total-a.total||b.n-a.n||a.agency.localeCompare(b.agency,'ja'));
+  }
+  let hits=[];
+  function draw(rows){
+    const minN=+minEl.value,shown=rows.filter(x=>x.n>=minN),r=canvas.getBoundingClientRect(),dpr=Math.min(2,devicePixelRatio||1),w=Math.max(300,r.width||300),h=Math.max(260,r.height||300);canvas.width=w*dpr;canvas.height=h*dpr;const ctx=canvas.getContext('2d');ctx.setTransform(dpr,0,0,dpr,0,0);ctx.clearRect(0,0,w,h);hits=[];
+    const pad={l:42,r:20,t:18,b:34},pw=w-pad.l-pad.r,ph=h-pad.t-pad.b,maxN=Math.max(minN,...shown.map(x=>x.n),1),maxA=Math.max(1,...shown.map(x=>x.avg));ctx.font='8px Arial';ctx.textBaseline='middle';
+    for(let i=0;i<=4;i++){const yy=pad.t+ph-ph*i/4;ctx.strokeStyle='#25262b';ctx.beginPath();ctx.moveTo(pad.l,yy);ctx.lineTo(w-pad.r,yy);ctx.stroke();ctx.fillStyle='#62656c';ctx.textAlign='right';ctx.fillText((maxA*i/4).toFixed(1),pad.l-6,yy)}
+    for(let i=0;i<=4;i++){const xx=pad.l+pw*i/4;ctx.strokeStyle='#202126';ctx.beginPath();ctx.moveTo(xx,pad.t);ctx.lineTo(xx,pad.t+ph);ctx.stroke();ctx.fillStyle='#62656c';ctx.textAlign='center';ctx.fillText(String(Math.round(maxN*i/4)),xx,h-pad.b+13)}
+    ctx.fillStyle='#777a81';ctx.textAlign='left';ctx.fillText('AVG',4,10);ctx.textAlign='right';ctx.fillText('n',w-5,h-8);
+    const labels=new Set([...shown].sort((a,b)=>b.total-a.total).slice(0,8).map(x=>x.agency));
+    shown.forEach(x=>{const cx=pad.l+(x.n/maxN)*pw,cy=pad.t+ph-(x.avg/maxA)*ph,rr=3+Math.max(0,Math.min(7,x.depth/100*7));ctx.fillStyle=x.dna==='漫才特化型'?'rgba(239,90,84,.58)':x.dna==='コント特化型'?'rgba(107,165,223,.58)':'rgba(223,188,104,.6)';ctx.strokeStyle='rgba(230,232,236,.46)';ctx.beginPath();ctx.arc(cx,cy,rr,0,Math.PI*2);ctx.fill();ctx.stroke();hits.push({x:cx,y:cy,r:rr+7,row:x});if(labels.has(x.agency)){ctx.fillStyle='#aeb0b6';ctx.textAlign='left';ctx.fillText(x.agency,cx+rr+3,cy)}});
+  }
+  function render(){
+    const rows=data(),minN=+minEl.value,q=rows.filter(x=>x.n>=minN),top=[...q].sort((a,b)=>b.total-a.total)[0],deep=[...q].sort((a,b)=>b.depth-a.depth||b.total-a.total)[0],newstar=[...q].sort((a,b)=>b.breakRate-a.breakRate||b.breakthroughTeams-a.breakthroughTeams)[0],stable=[...q].filter(x=>x.retEligible>=3).sort((a,b)=>b.retention-a.retention||b.retEligible-a.retEligible)[0],cross=[...q].sort((a,b)=>b.crossRate-a.crossRate||b.cross-a.cross)[0];
+    const [a,b]=bounds();summary.innerHTML=`<div class="evosum"><span>PERIOD</span><b>${a}–${b}</b></div><div class="evosum"><span>QUALIFIED</span><b>${q.length}事務所</b></div><div class="evosum"><span>POWER LEADER</span><b>${top?esc(top.agency)+' / '+top.total+'pt':'—'}</b></div><div class="evosum"><span>DEEPEST ROSTER</span><b>${deep?esc(deep.agency)+' / '+deep.depth.toFixed(1)+'%':'—'}</b></div><div class="evosum"><span>NEW STAR RATE</span><b>${newstar?esc(newstar.agency)+' / '+newstar.breakRate.toFixed(1)+'%':'—'}</b></div><div class="evosum"><span>MIN SAMPLE</span><b>n ≥ ${minN}</b></div>`;
+    const card=(cap,x,metric,detail)=>`<div class="atypecard"><span>${cap}</span><b>${x?esc(x.agency):'—'}</b><small>${x?metric(x):'該当なし'}</small>${x?`<span class="atypepill">${x.archetype}</span>`:''}</div>`;
+    cards.innerHTML=card('DEEPEST ROSTER',deep,x=>`DEPTH ${x.depth.toFixed(1)}% / TOP1依存 ${x.ace.toFixed(1)}%`)+card('BREAKTHROUGH',newstar,x=>`初SF+ ${x.breakthroughTeams}組 / ${x.breakRate.toFixed(1)}%`)+card('RETENTION',stable,x=>`翌年QF+維持 ${x.retention.toFixed(1)}% / 判定${x.retEligible}件`)+card('CROSSOVER',cross,x=>`M-1×KOC両方 ${x.cross}組 / ${x.crossRate.toFixed(1)}%`);
+    const dnaClass=x=>x.dna==='漫才特化型'?'m1':x.dna==='コント特化型'?'koc':'dual';
+    tableWrap.innerHTML=`<table class="insighttable"><thead><tr><th>#</th><th>事務所</th><th>ARCHETYPE</th><th>DNA</th><th>POWER</th><th>AVG</th><th>n</th><th>DEPTH</th><th>TOP1依存</th><th>BREAKTHROUGH</th><th>RETENTION</th><th>CROSSOVER</th></tr></thead><tbody>${rows.map((x,i)=>`<tr class="${x.n<minN?'insightbelow':''}"><td>${x.n>=minN?i+1:'—'}</td><td><strong>${esc(x.agency)}</strong></td><td><span class="struct-tag">${x.archetype}</span></td><td><span class="dna-tag ${dnaClass(x)}">${x.dna}</span></td><td><strong>${x.total}</strong></td><td>${x.avg.toFixed(2)}</td><td>${x.n}</td><td class="${x.depth>=70?'metricgood':''}">${x.depth.toFixed(1)}%</td><td>${x.ace.toFixed(1)}%</td><td>${x.breakthroughTeams} / ${x.breakRate.toFixed(1)}%</td><td class="${x.retEligible<3?'metricsoft':''}">${x.retEligible?x.retention.toFixed(1)+'% ('+x.retEligible+')':'—'}</td><td>${x.crossRate.toFixed(1)}%</td></tr>`).join('')}</tbody></table>`;
+    draw(rows);
+  }
+  function hitAt(e){const r=canvas.getBoundingClientRect(),x=e.clientX-r.left,y=e.clientY-r.top;return hits.find(p=>Math.hypot(x-p.x,y-p.y)<=p.r)}
+  canvas.addEventListener('pointermove',e=>{const p=hitAt(e);if(!p){tip.classList.remove('show');return}const b=canvas.parentElement.getBoundingClientRect(),x=p.row;tip.innerHTML=`<b>${esc(x.agency)}</b><br>${x.archetype} / ${x.dna}<br>AVG ${x.avg.toFixed(2)} ／ n=${x.n}<br>DEPTH ${x.depth.toFixed(1)}% ／ TOP1 ${x.ace.toFixed(1)}%`;tip.style.left=Math.min(e.clientX-b.left+10,b.width-210)+'px';tip.style.top=(e.clientY-b.top+8)+'px';tip.classList.add('show')});canvas.addEventListener('pointerleave',()=>tip.classList.remove('show'));
+  rangeEl.addEventListener('change',render);minEl.addEventListener('change',render);
+  document.getElementById('insightCsv').addEventListener('click',()=>{const rows=data(),minN=+minEl.value,[a,b]=bounds(),out=[['期間','事務所','ARCHETYPE','DNA','POWER','AVG','n','DEPTH','TOP1_DEPENDENCY','BREAKTHROUGH_COUNT','BREAKTHROUGH_RATE','RETENTION_RATE','RETENTION_N','CROSSOVER_RATE','QUALIFIED']];for(const x of rows)out.push([`${a}-${b}`,x.agency,x.archetype,x.dna,x.total,x.avg.toFixed(3),x.n,x.depth.toFixed(1),x.ace.toFixed(1),x.breakthroughTeams,x.breakRate.toFixed(1),x.retEligible?x.retention.toFixed(1):'',x.retEligible,x.crossRate.toFixed(1),x.n>=minN?'YES':'NO']);const csv=out.map(r=>r.map(v=>`"${String(v??'').replaceAll('"','""')}"`).join(',')).join('\r\n'),blob=new Blob(['\uFEFF'+csv],{type:'text/csv'}),u=URL.createObjectURL(blob),ael=document.createElement('a');ael.href=u;ael.download=`agency_insights_${a}_${b}_v220.csv`;ael.click();URL.revokeObjectURL(u)});
+  let rt;addEventListener('resize',()=>{if(root.hidden)return;clearTimeout(rt);rt=setTimeout(render,140)});
+  render();window.M1KOC_RENDER_AGENCY_INSIGHTS=render;window.M1KOC_AGENCY_INSIGHTS={version:'v220',default_min_n:5,metrics:['depth','ace_dependency','breakthrough','retention','crossover','dna','archetype']};window.M1KOC_CHECKPOINT={...(window.M1KOC_CHECKPOINT||{}),version:'v220',focus:'agency archetypes / roster depth / breakthrough / retention',checked_at:'2026-09-14'};
+})();
+
+
+/* v222 agency visuals + clickable focus */
+(()=>{
+  const root=document.getElementById('agencyVisuals');
+  if(!root)return;
+  const contestEl=document.getElementById('visualContest'),rangeEl=document.getElementById('visualRange'),summary=document.getElementById('visualSummary');
+  const landscape=document.getElementById('visualLandscape'),landTip=document.getElementById('visualLandscapeTip');
+  const dominance=document.getElementById('visualDominance'),heatmap=document.getElementById('visualHeatmap');
+  const focusChart=document.getElementById('visualFocusChart'),focusStats=document.getElementById('visualFocusStats'),focusList=document.getElementById('visualFocusList'),focusChip=document.getElementById('visualFocusChip'),focusMeta=document.getElementById('visualFocusMeta');
+  const stageKey=v=>/優勝/.test(v)?'win':/^決勝/.test(v)?'final':/準決勝/.test(v)?'sf':/準々決勝/.test(v)?'qf':/3回戦|３回戦/.test(v)?'r3':'';
+  const score=v=>({r3:1,qf:2,sf:3,final:5,win:15})[stageKey(v)]||0;
+  const agencyCanonical=d=>{let k=d.agency_key||d.agency||'';if(k==='mixed')return'複数所属';if(k==='サンミュージック')return'サンミュージックプロダクション';if(k==='SMA NEET PROJECT')return'SMA';return k};
+  const bounds=()=>rangeEl.value==='modern'?[2015,2025]:rangeEl.value==='both'?[2008,2025]:[2001,2025];
+  const contests=()=>contestEl.value==='combined'?['m1','koc']:[contestEl.value];
+  const inRange=y=>{const [a,b]=bounds();return +y>=a&&+y<=b};
+  const dnaOf=(m1,koc)=>contestEl.value==='m1'?'漫才寄り':contestEl.value==='koc'?'コント寄り':(m1+koc)?(m1/(m1+koc)>=.65?'漫才寄り':m1/(m1+koc)<=.35?'コント寄り':'二刀流'):'二刀流';
+  const colorFor=dna=>contestEl.value==='m1'?'rgba(239,90,84,.58)':contestEl.value==='koc'?'rgba(107,165,223,.58)':dna==='漫才寄り'?'rgba(239,90,84,.58)':dna==='コント寄り'?'rgba(107,165,223,.58)':'rgba(223,188,104,.60)';
+  let selectedAgency='';
+  function agencyRows(){
+    const by=new Map();
+    for(const d of DB){
+      if(!d.agency_verified||!d.agency)continue;
+      let m1=0,koc=0,has=false;
+      for(const [y,v] of Object.entries(d.m1||{})){ if(inRange(y)){ const pt=score(v); if(pt){m1+=pt; if(contests().includes('m1')) has=true;} } }
+      for(const [y,v] of Object.entries(d.koc||{})){ if(inRange(y)){ const pt=score(v); if(pt){koc+=pt; if(contests().includes('koc')) has=true;} } }
+      const total=contestEl.value==='m1'?m1:(contestEl.value==='koc'?koc:m1+koc);
+      if(!total&&!has)continue;
+      const a=agencyCanonical(d);
+      if(!by.has(a))by.set(a,{agency:a,n:0,total:0,m1:0,koc:0,teams:[]});
+      const row=by.get(a); row.n++; row.total+=total; row.m1+=m1; row.koc+=koc; row.teams.push({name:d.name,total,m1,koc});
+    }
+    return [...by.values()].map(r=>({...r,avg:r.n?r.total/r.n:0,dna:dnaOf(r.m1,r.koc)})).sort((a,b)=>b.total-a.total||b.avg-a.avg||b.n-a.n||a.agency.localeCompare(b.agency,'ja'));
+  }
+  function yearlyData(){
+    const [a,b]=bounds(), years=[]; for(let y=a;y<=b;y++)years.push(y);
+    return years.map(y=>{
+      const byAgency=new Map();
+      for(const d of DB){
+        if(!d.agency_verified||!d.agency)continue; const agency=agencyCanonical(d); let pt=0;
+        for(const c of contests()){ const obj=(c==='m1'?d.m1:d.koc)||{}; if(obj[String(y)]) pt+=score(obj[String(y)]); }
+        if(!pt)continue; byAgency.set(agency,(byAgency.get(agency)||0)+pt);
+      }
+      const rows=[...byAgency.entries()].map(([agency,total])=>({agency,total})).sort((x,y)=>y.total-x.total||x.agency.localeCompare(y.agency,'ja'));
+      const total=rows.reduce((s,x)=>s+x.total,0);
+      return {year:y,rows,total,top1:total?(rows[0]?.total||0)/total*100:0,top3:total?rows.slice(0,3).reduce((s,x)=>s+x.total,0)/total*100:0,agencies:rows.length};
+    }).filter(x=>x.total>0);
+  }
+  function focusData(agency){
+    if(!agency) return null;
+    const [a,b]=bounds(), years=[]; for(let y=a;y<=b;y++)years.push(y);
+    const members=[];
+    const ptsByTeam=new Map();
+    years.forEach(y=>0);
+    const series=years.map(y=>({year:y,m1:0,koc:0,total:0}));
+    for(const d of DB){
+      if(!d.agency_verified||agencyCanonical(d)!==agency) continue;
+      let teamTotal=0, teamM1=0, teamKoc=0;
+      years.forEach((y,idx)=>{ let m=0,k=0; if(d.m1?.[String(y)]) m=score(d.m1[String(y)]); if(d.koc?.[String(y)]) k=score(d.koc[String(y)]); series[idx].m1+=m; series[idx].koc+=k; series[idx].total+= contestEl.value==='m1'?m:(contestEl.value==='koc'?k:m+k); teamM1+=m; teamKoc+=k; teamTotal += contestEl.value==='m1'?m:(contestEl.value==='koc'?k:m+k); });
+      if(teamTotal>0){ members.push(d.name); ptsByTeam.set(d.name,{name:d.name,total:teamTotal,m1:teamM1,koc:teamKoc}); }
+    }
+    const topTeams=[...ptsByTeam.values()].sort((x,y)=>y.total-x.total||x.name.localeCompare(y.name,'ja')).slice(0,5);
+    const total=series.reduce((s,x)=>s+x.total,0), n=ptsByTeam.size, avg=n?total/n:0;
+    let best=series.reduce((best,x)=>x.total>(best?.total||-1)?x:best,null);
+    const m1=series.reduce((s,x)=>s+x.m1,0), koc=series.reduce((s,x)=>s+x.koc,0), dna=dnaOf(m1,koc);
+    return {agency,series:series.filter(x=>x.total>0||x.m1>0||x.koc>0),total,n,avg,m1,koc,dna,best,bestShare:total&&best?best.total/total*100:0,topTeams};
+  }
+  let landscapeHits=[];
+  function drawLandscape(rows){
+    const r=landscape.getBoundingClientRect(),dpr=Math.min(2,window.devicePixelRatio||1),w=Math.max(320,r.width||320),h=Math.max(280,r.height||320); landscape.width=w*dpr; landscape.height=h*dpr; const ctx=landscape.getContext('2d'); ctx.setTransform(dpr,0,0,dpr,0,0); ctx.clearRect(0,0,w,h); landscapeHits=[];
+    const shown=rows.slice(0,24),pad={l:42,r:18,t:18,b:34},pw=w-pad.l-pad.r,ph=h-pad.t-pad.b,maxN=Math.max(1,...shown.map(x=>x.n)),maxA=Math.max(1,...shown.map(x=>x.avg)),maxT=Math.max(1,...shown.map(x=>x.total)); ctx.font='8px Arial'; ctx.textBaseline='middle';
+    for(let i=0;i<=4;i++){ const yy=pad.t+ph-ph*i/4; ctx.strokeStyle='#25262b'; ctx.beginPath(); ctx.moveTo(pad.l,yy); ctx.lineTo(w-pad.r,yy); ctx.stroke(); ctx.fillStyle='#64676e'; ctx.textAlign='right'; ctx.fillText((maxA*i/4).toFixed(1),pad.l-6,yy);}
+    for(let i=0;i<=4;i++){ const xx=pad.l+pw*i/4; ctx.strokeStyle='#202126'; ctx.beginPath(); ctx.moveTo(xx,pad.t); ctx.lineTo(xx,pad.t+ph); ctx.stroke(); ctx.fillStyle='#64676e'; ctx.textAlign='center'; ctx.fillText(String(Math.round(maxN*i/4)),xx,h-pad.b+13);}
+    ctx.fillStyle='#777a81'; ctx.textAlign='left'; ctx.fillText('AVG',4,10); ctx.textAlign='right'; ctx.fillText('n',w-4,h-9);
+    const labels=new Set(shown.slice(0,10).map(x=>x.agency));
+    shown.forEach(x=>{ const cx=pad.l+(x.n/maxN)*pw, cy=pad.t+ph-(x.avg/maxA)*ph, rr=4+Math.sqrt(x.total/maxT)*12; const selected=x.agency===selectedAgency; ctx.fillStyle=colorFor(x.dna); ctx.strokeStyle=selected?'rgba(255,255,255,.92)':'rgba(235,237,240,.48)'; ctx.lineWidth=selected?2.2:1; ctx.beginPath(); ctx.arc(cx,cy,rr,0,Math.PI*2); ctx.fill(); ctx.stroke(); landscapeHits.push({x:cx,y:cy,r:rr+7,row:x}); if(labels.has(x.agency)||selected){ ctx.fillStyle=selected?'#f0f1f2':'#aeb0b6'; ctx.textAlign='left'; ctx.fillText(x.agency,cx+rr+4,cy);} });
+    ctx.lineWidth=1;
+  }
+  function drawDominance(series){
+    const r=dominance.getBoundingClientRect(),dpr=Math.min(2,window.devicePixelRatio||1),w=Math.max(320,r.width||320),h=Math.max(280,r.height||320); dominance.width=w*dpr; dominance.height=h*dpr; const ctx=dominance.getContext('2d'); ctx.setTransform(dpr,0,0,dpr,0,0); ctx.clearRect(0,0,w,h); const pad={l:34,r:18,t:18,b:36},pw=w-pad.l-pad.r,ph=h-pad.t-pad.b,maxY=100; ctx.font='8px Arial'; ctx.textBaseline='middle';
+    for(let i=0;i<=5;i++){const yy=pad.t+ph-ph*i/5; ctx.strokeStyle='#25262b'; ctx.beginPath(); ctx.moveTo(pad.l,yy); ctx.lineTo(w-pad.r,yy); ctx.stroke(); ctx.fillStyle='#666970'; ctx.textAlign='right'; ctx.fillText(String(Math.round(maxY*i/5))+'%',pad.l-5,yy);}
+    const xs=(idx)=> series.length<=1?pad.l+pw/2: pad.l+pw*(idx/(series.length-1));
+    ;[0, Math.floor((series.length-1)/2), series.length-1].filter((v,i,a)=>v>=0&&a.indexOf(v)===i).forEach(i=>{const xx=xs(i); ctx.strokeStyle='#202126'; ctx.beginPath(); ctx.moveTo(xx,pad.t); ctx.lineTo(xx,pad.t+ph); ctx.stroke(); ctx.fillStyle='#666970'; ctx.textAlign='center'; ctx.fillText(String(series[i].year),xx,h-pad.b+13);});
+    const line=(field,color)=>{ctx.strokeStyle=color;ctx.lineWidth=2;ctx.beginPath();series.forEach((p,i)=>{const xx=xs(i),yy=pad.t+ph-(p[field]/maxY)*ph; i?ctx.lineTo(xx,yy):ctx.moveTo(xx,yy)});ctx.stroke(); ctx.fillStyle=color; series.forEach((p,i)=>{const xx=xs(i),yy=pad.t+ph-(p[field]/maxY)*ph; ctx.beginPath(); ctx.arc(xx,yy,2.8,0,Math.PI*2); ctx.fill();});};
+    if(series.length){ line('top3','#9bc3eb'); line('top1','#e4c878'); }
+    ctx.lineWidth=1;
+  }
+  function renderHeatmap(rows,yearSeries){
+    const years=yearSeries.map(x=>x.year), top=rows.slice(0,12), maxCell=Math.max(1,...top.flatMap(r=>years.map(y=>{const yd=yearSeries.find(s=>s.year===y);const m=yd?.rows.find(z=>z.agency===r.agency);return m?m.total:0;})));
+    const accent=contestEl.value==='m1'?[239,90,84]:contestEl.value==='koc'?[107,165,223]:[223,188,104];
+    const makeCell=v=>{const alpha=v?Math.max(.08,Math.min(.88,v/maxCell*.88)):0; const style=v?`background:rgba(${accent[0]},${accent[1]},${accent[2]},${alpha.toFixed(3)});`:''; return [style, v?String(v):'—'];};
+    heatmap.innerHTML=`<table class="visualheat"><thead><tr><th>事務所</th>${years.map(y=>`<th>${y}</th>`).join('')}</tr></thead><tbody>${top.map(r=>`<tr data-agency="${esc(r.agency)}" class="${r.agency===selectedAgency?'isfocus':''}"><td><span class="agencyname">${esc(r.agency)}</span><span class="sub">${r.total}pt / n=${r.n}</span></td>${years.map(y=>{const yd=yearSeries.find(s=>s.year===y);const m=yd?.rows.find(z=>z.agency===r.agency);const v=m?m.total:0;const [style,label]=makeCell(v);const best=yd?.rows[0]?.agency===r.agency?' topyear':'';return `<td class="${v?'' :'zero'}${best}" style="${style}">${label}</td>`;}).join('')}</tr>`).join('')}</tbody></table>`;
+    heatmap.querySelectorAll('tbody tr[data-agency]').forEach(tr=>tr.addEventListener('click',()=>{selectedAgency=tr.dataset.agency;render();}));
+  }
+  function drawFocus(focus){
+    const r=focusChart.getBoundingClientRect(),dpr=Math.min(2,window.devicePixelRatio||1),w=Math.max(320,r.width||320),h=Math.max(280,r.height||300); focusChart.width=w*dpr; focusChart.height=h*dpr; const ctx=focusChart.getContext('2d'); ctx.setTransform(dpr,0,0,dpr,0,0); ctx.clearRect(0,0,w,h);
+    if(!focus||!focus.series.length){ ctx.fillStyle='#80838a'; ctx.font='10px Arial'; ctx.textAlign='center'; ctx.fillText('事務所を選択すると年次推移を表示します',w/2,h/2); return; }
+    const series=focus.series, pad={l:34,r:18,t:18,b:36}, pw=w-pad.l-pad.r, ph=h-pad.t-pad.b, maxY=Math.max(1,...series.map(x=>contestEl.value==='combined'?x.total:(contestEl.value==='m1'?x.m1:x.koc))); ctx.font='8px Arial'; ctx.textBaseline='middle';
+    for(let i=0;i<=4;i++){ const yy=pad.t+ph-ph*i/4; ctx.strokeStyle='#25262b'; ctx.beginPath(); ctx.moveTo(pad.l,yy); ctx.lineTo(w-pad.r,yy); ctx.stroke(); ctx.fillStyle='#666970'; ctx.textAlign='right'; ctx.fillText((maxY*i/4).toFixed(0),pad.l-5,yy); }
+    const bw=Math.max(8, Math.min(24, (pw/Math.max(1,series.length))*0.6)); const xs=(idx)=>pad.l + (series.length<=1?pw/2:pw*(idx/(series.length-1)));
+    series.forEach((p,i)=>{ const x=xs(i); const base=pad.t+ph; if(contestEl.value==='combined'){ const hm=ph*(p.m1/maxY), hk=ph*(p.koc/maxY); if(hm){ctx.fillStyle='rgba(239,90,84,.72)'; ctx.fillRect(x-bw/2, base-hm, bw, hm);} if(hk){ctx.fillStyle='rgba(107,165,223,.72)'; ctx.fillRect(x-bw/2, base-hm-hk, bw, hk);} } else { const val=contestEl.value==='m1'?p.m1:p.koc, hh=ph*(val/maxY); ctx.fillStyle=contestEl.value==='m1'?'rgba(239,90,84,.76)':'rgba(107,165,223,.76)'; if(hh) ctx.fillRect(x-bw/2, base-hh, bw, hh);} });
+    const totalLine=series.map(p=>({year:p.year,val:contestEl.value==='m1'?p.m1:contestEl.value==='koc'?p.koc:p.total})); ctx.strokeStyle='rgba(223,188,104,.95)'; ctx.lineWidth=1.6; ctx.beginPath(); totalLine.forEach((p,i)=>{ const x=xs(i), y=pad.t+ph-(p.val/maxY)*ph; i?ctx.lineTo(x,y):ctx.moveTo(x,y);}); ctx.stroke(); ctx.fillStyle='rgba(223,188,104,.95)'; totalLine.forEach((p,i)=>{ const x=xs(i), y=pad.t+ph-(p.val/maxY)*ph; ctx.beginPath(); ctx.arc(x,y,2.2,0,Math.PI*2); ctx.fill(); });
+    [0, Math.floor((series.length-1)/2), series.length-1].filter((v,i,a)=>v>=0&&a.indexOf(v)===i).forEach(i=>{ const x=xs(i); ctx.fillStyle='#666970'; ctx.textAlign='center'; ctx.fillText(String(series[i].year),x,h-pad.b+13); }); ctx.lineWidth=1;
+  }
+  function renderFocus(focus){
+    drawFocus(focus);
+    if(!focus){ focusChip.textContent='NO AGENCY SELECTED'; focusMeta.textContent='点または行をクリックしてください'; focusStats.innerHTML='<div class="focusempty">LANDSCAPE または HEATMAP から事務所を選択してください</div>'; focusList.innerHTML=''; return; }
+    focusChip.textContent=focus.agency; focusMeta.textContent=`${focus.dna} / ${bounds()[0]}–${bounds()[1]} / ${contestEl.value==='combined'?'M-1 + KOC':contestEl.value.toUpperCase()}`;
+    const stat=(k,v,s='')=>`<div class="focusstat"><span>${k}</span><b>${v}</b>${s?`<small>${s}</small>`:''}</div>`;
+    focusStats.innerHTML=stat('POWER',focus.total+'pt',`M-1 ${focus.m1} / KOC ${focus.koc}`)+stat('AVERAGE',focus.avg.toFixed(2),`収録ユニット ${focus.n}組`)+stat('BEST YEAR',focus.best?focus.best.year:'—',focus.best?`${focus.best.total}pt / 全体の${focus.bestShare.toFixed(1)}%`:'' )+stat('DNA',focus.dna,'クリック選択中の詳細ビュー');
+    focusList.innerHTML=`<b>TOP CONTRIBUTORS</b>${focus.topTeams.length?`<ol>${focus.topTeams.map(t=>`<li><button type="button" class="focus-team-link" data-team="${encodeURIComponent(t.name)}">${esc(t.name)}</button><span>${t.total}pt${contestEl.value==='combined'?` / M-1 ${t.m1}・KOC ${t.koc}`:''}</span></li>`).join('')}</ol>`:'<div class="focusempty" style="min-height:120px">該当ユニットがありません</div>'}`;
+    focusList.querySelectorAll('.focus-team-link').forEach(btn=>btn.addEventListener('click',()=>{const name=decodeURIComponent(btn.dataset.team||'');if(name&&typeof window.M1KOC_OPEN_DETAIL==='function')window.M1KOC_OPEN_DETAIL(name)}));
+  }
+  function ensureSelection(rows){
+    if(selectedAgency && rows.some(r=>r.agency===selectedAgency)) return;
+    selectedAgency = rows[0]?.agency || '';
+  }
+  function render(){
+    const rows=agencyRows(), years=yearlyData(); ensureSelection(rows); const focus=focusData(selectedAgency); const [a,b]=bounds();
+    const leader=rows[0], quality=[...rows].sort((x,y)=>y.avg-x.avg||y.total-x.total)[0], deep=[...rows].sort((x,y)=>y.n-x.n||y.total-x.total)[0], dense=years.length?[...years].sort((x,y)=>y.top3-x.top3)[0]:null;
+    summary.innerHTML=`<div class="evosum"><span>MODE</span><b>${contestEl.value==='combined'?'M-1 + KOC':contestEl.value.toUpperCase()}</b></div><div class="evosum"><span>PERIOD</span><b>${a}–${b}</b></div><div class="evosum"><span>POWER LEADER</span><b>${leader?esc(leader.agency)+' / '+leader.total+'pt':'—'}</b></div><div class="evosum"><span>HIGHEST AVG</span><b>${quality?esc(quality.agency)+' / '+quality.avg.toFixed(2):'—'}</b></div><div class="evosum"><span>BIGGEST ROSTER</span><b>${deep?esc(deep.agency)+' / n='+deep.n:'—'}</b></div><div class="evosum"><span>PEAK DOMINANCE</span><b>${dense?dense.year+' / TOP3 '+dense.top3.toFixed(1)+'%':'—'}</b></div>`;
+    drawLandscape(rows); drawDominance(years); renderHeatmap(rows,years); renderFocus(focus);
+  }
+  function hitAt(e){ const r=landscape.getBoundingClientRect(),x=e.clientX-r.left,y=e.clientY-r.top; return landscapeHits.find(p=>Math.hypot(x-p.x,y-p.y)<=p.r); }
+  landscape.addEventListener('pointermove',e=>{ const p=hitAt(e); if(!p){ landTip.classList.remove('show'); return; } const b=landscape.parentElement.getBoundingClientRect(),x=p.row; landTip.innerHTML=`<b>${esc(x.agency)}</b><br>${x.dna}<br>POWER ${x.total}pt ／ AVG ${x.avg.toFixed(2)}<br>n=${x.n} ／ M-1 ${x.m1} / KOC ${x.koc}<br><span style="color:#8d9097">クリックで詳細</span>`; landTip.style.left=Math.min(e.clientX-b.left+10,b.width-220)+'px'; landTip.style.top=(e.clientY-b.top+8)+'px'; landTip.classList.add('show'); });
+  landscape.addEventListener('pointerleave',()=>landTip.classList.remove('show'));
+  landscape.addEventListener('click',e=>{ const p=hitAt(e); if(!p) return; selectedAgency=p.row.agency; render(); const box=document.getElementById('visualFocusChart'); box?.scrollIntoView({behavior:'smooth',block:'center'}); });
+  contestEl.addEventListener('change',render); rangeEl.addEventListener('change',render);
+  let rt; addEventListener('resize',()=>{ if(root.hidden) return; clearTimeout(rt); rt=setTimeout(render,140); });
+  render(); window.M1KOC_RENDER_AGENCY_VISUALS=render; window.M1KOC_AGENCY_VISUALS={version:'v223',views:['landscape','dominance_timeline','yearly_heatmap','agency_focus'],click_to_focus:true,contributor_detail_links:true}; window.M1KOC_CHECKPOINT={...(window.M1KOC_CHECKPOINT||{}),version:'v223',focus:'agency visuals + clickable contributor detail links',checked_at:'2026-09-14'};
+})();
+
+
+/* v224 discovery lab */
+(()=>{
+  const root=document.getElementById('discoveryRoot'); if(!root)return;
+  const tabs=[...document.querySelectorAll('[data-discovery-tab]')], panels=[...document.querySelectorAll('[data-discovery-panel]')], hint=document.getElementById('discoveryHint');
+  const info={
+    generation:{hint:'結成年ごとに、どの世代が厚く・強いかを可視化します。',title:'GENERATION',html:'<p><b>結成年</b>を3年帯でまとめ、平均POWER・準決勝以上率・決勝到達率を比較します。世代の厚さと到達力を同時に見るためのビューです。</p>'},
+    momentum:{hint:'直近3年と、その前3年を比べて「最近伸びている組」を見ます。',title:'MOMENTUM',html:'<p><b>MOMENTUM</b>は未来予測ではありません。直近3大会年の加重POWERと、その前3大会年の加重POWERとの差を使い、最近の上昇・下降を可視化します。</p>'},
+    path:{hint:'初決勝の1〜3年前に、どこまで来ていたかを集計します。',title:'PATH TO FINAL',html:'<p>各ユニットの<b>初決勝年</b>を起点に、その1〜3年前の到達ラウンドを集計します。「QF→SF→決勝」のような典型ルートがどれくらい多いかを見ます。</p>'},
+    crossover:{hint:'M-1とKOCの両方で強い“二刀流”を可視化します。',title:'CROSSOVER',html:'<p>横軸にM-1 POWER、縦軸にKOC POWERを置き、両大会の強さを同時に比較します。右上ほど、漫才・コントの双方で実績が高いユニットです。</p>'},
+    forecast:{hint:'実績重視 ↔ 新星重視を動かして、決勝候補10組をシミュレーションします。',title:'FINALIST FORECAST',html:'<p><b>FORECAST</b>は未来を断定するものではなく、前年までのDB戦績だけで候補順位を動かすシミュレーションです。左ほど累積実績・決勝/SF継続、右ほど直近モメンタム・初決勝余地・若手性を強く評価します。2026年の既知結果は計算から除外します。</p>'}
+  };
+  let current='generation';
+  function showHelp(all=false){ const t=info[current]; dialogTitle.textContent=all?'DISCOVERY GUIDE':t.title; dialogContent.innerHTML=all?Object.values(info).map(x=>`<section class="dialogsection"><h3>${x.title}</h3>${x.html}</section>`).join(''):`<section class="dialogsection"><h3>${t.title}</h3>${t.html}</section>`; infoDialog.showModal(); }
+  function setTab(name){ current=name; tabs.forEach(b=>{const on=b.dataset.discoveryTab===name;b.classList.toggle('on',on);b.setAttribute('aria-selected',on?'true':'false')}); panels.forEach(p=>p.hidden=p.dataset.discoveryPanel!==name); hint.textContent=info[name].hint; requestAnimationFrame(()=>renderCurrent()); try{sessionStorage.setItem('m1kocDiscoveryTab',name)}catch(e){} }
+  document.getElementById('discoveryGuide')?.addEventListener('click',()=>showHelp(true)); document.getElementById('discoveryHelp')?.addEventListener('click',()=>showHelp(false)); root.querySelector('#discoveryTabs')?.addEventListener('click',e=>{const b=e.target.closest('[data-discovery-tab]');if(b)setTab(b.dataset.discoveryTab)});
+  const sk=v=>/優勝/.test(v)?'win':/^決勝/.test(v)?'final':/準決勝/.test(v)?'sf':/準々決勝/.test(v)?'qf':/3回戦|３回戦/.test(v)?'r3':'';
+  const pt=v=>({r3:1,qf:2,sf:3,final:5,win:15})[sk(v)]||0;
+  const rv=v=>({r3:1,qf:2,sf:3,final:4,win:5})[sk(v)]||0;
+  const stage=v=>({r3:'3回戦',qf:'QF',sf:'SF',final:'決勝',win:'優勝'})[sk(v)]||'—';
+  const contestObjs=(d,c)=>c==='combined'?[d.m1||{},d.koc||{}]:[c==='m1'?(d.m1||{}):(d.koc||{})];
+  const totalPower=(d,c)=>contestObjs(d,c).reduce((s,o)=>s+Object.values(o).reduce((a,v)=>a+pt(v),0),0);
+  const maxRank=(d,c)=>contestObjs(d,c).reduce((m,o)=>Math.max(m,...Object.values(o).map(rv),0),0);
+  function openName(name){ if(typeof openD==='function')openD(name); }
+  const wireNames=scope=>scope.querySelectorAll('[data-name]').forEach(el=>el.addEventListener('click',()=>openName(el.dataset.name)));
+
+  // GENERATION
+  function renderGeneration(){
+    const c=document.getElementById('genContest').value, rows=DB.map(d=>{const fy=+d.formed;if(!fy)return null;const p=totalPower(d,c),r=maxRank(d,c);if(!p)return null;return{d,fy,p,r}}).filter(Boolean);
+    const min=Math.floor(Math.min(...rows.map(x=>x.fy))/3)*3, max=Math.max(...rows.map(x=>x.fy)); const cohorts=[];
+    for(let y=min;y<=max;y+=3){const xs=rows.filter(x=>x.fy>=y&&x.fy<=y+2);if(!xs.length)continue;const n=xs.length,total=xs.reduce((s,x)=>s+x.p,0),avg=total/n,sf=xs.filter(x=>x.r>=3).length,fin=xs.filter(x=>x.r>=4).length;cohorts.push({label:`${y}–${y+2}`,start:y,n,total,avg,sfRate:sf/n*100,finalRate:fin/n*100});}
+    const chart=document.getElementById('generationChart'), r=chart.getBoundingClientRect(),dpr=Math.min(2,devicePixelRatio||1),w=Math.max(300,r.width||300),h=Math.max(260,r.height||300);chart.width=w*dpr;chart.height=h*dpr;const ctx=chart.getContext('2d');ctx.setTransform(dpr,0,0,dpr,0,0);ctx.clearRect(0,0,w,h);const top=cohorts.slice(-14),pad={l:36,r:10,t:12,b:56},pw=w-pad.l-pad.r,ph=h-pad.t-pad.b,maxA=Math.max(1,...top.map(x=>x.avg));ctx.font='8px Arial';
+    top.forEach((x,i)=>{const bw=pw/top.length*.62,xx=pad.l+(i+.5)*pw/top.length,hh=ph*x.avg/maxA;ctx.fillStyle='rgba(223,188,104,.68)';ctx.fillRect(xx-bw/2,pad.t+ph-hh,bw,hh);ctx.fillStyle='#6f7279';ctx.textAlign='center';ctx.save();ctx.translate(xx,h-8);ctx.rotate(-.7);ctx.fillText(x.label,0,0);ctx.restore()});
+    for(let i=0;i<=4;i++){const yy=pad.t+ph-ph*i/4;ctx.strokeStyle='#25262b';ctx.beginPath();ctx.moveTo(pad.l,yy);ctx.lineTo(w-pad.r,yy);ctx.stroke();ctx.fillStyle='#666970';ctx.textAlign='right';ctx.fillText((maxA*i/4).toFixed(1),pad.l-5,yy)}
+    const best=[...cohorts].sort((a,b)=>b.avg-a.avg)[0],deep=[...cohorts].sort((a,b)=>b.n-a.n)[0],sf=[...cohorts].sort((a,b)=>b.sfRate-a.sfRate)[0],fin=[...cohorts].sort((a,b)=>b.finalRate-a.finalRate)[0]; const card=(k,x,v,s)=>`<div class="discovercard"><span>${k}</span><b>${x?x.label:'—'}</b><small>${x?v(x):'—'}${x&&s?` / ${s(x)}`:''}</small></div>`; document.getElementById('generationCards').innerHTML=card('HIGHEST AVG',best,x=>x.avg.toFixed(2)+' pt',x=>'n='+x.n)+card('BIGGEST COHORT',deep,x=>'n='+x.n,x=>x.total+'pt')+card('SF+ RATE',sf,x=>x.sfRate.toFixed(1)+'%',x=>'n='+x.n)+card('FINAL RATE',fin,x=>x.finalRate.toFixed(1)+'%',x=>'n='+x.n);
+    const maxV=Math.max(1,...cohorts.map(x=>x.avg));document.getElementById('generationTable').innerHTML=`<table class="generationtable"><thead><tr><th>結成年帯</th><th>n</th><th>総POWER</th><th>平均</th><th>SF+率</th><th>決勝率</th></tr></thead><tbody>${[...cohorts].reverse().map(x=>`<tr><td><strong>${x.label}</strong></td><td>${x.n}</td><td>${x.total}</td><td style="background:rgba(223,188,104,${Math.max(.03,x.avg/maxV*.42).toFixed(3)})">${x.avg.toFixed(2)}</td><td>${x.sfRate.toFixed(1)}%</td><td>${x.finalRate.toFixed(1)}%</td></tr>`).join('')}</tbody></table>`;
+  }
+
+  // MOMENTUM
+  function contestYears(c){const set=new Set();DB.forEach(d=>contestObjs(d,c).forEach(o=>Object.keys(o).forEach(y=>set.add(+y))));return [...set].filter(Boolean).sort((a,b)=>a-b)}
+  function renderMomentum(){
+    const c=document.getElementById('momentumContest').value, ys=contestYears(c), recent=ys.slice(-3), prev=ys.slice(-6,-3);
+    const scoreWindow=(d,years)=>{if(!years.length)return 0;let vals=years.map((y,i)=>{let s=0;contestObjs(d,c).forEach(o=>{if(o[String(y)])s+=pt(o[String(y)])});return{s,w:i+1}});const ws=vals.reduce((a,x)=>a+x.w,0);return vals.reduce((a,x)=>a+x.s*x.w,0)/ws};
+    const rows=DB.map(d=>{const now=scoreWindow(d,recent),before=scoreWindow(d,prev),m=now-before,total=totalPower(d,c);return{name:d.name,now,before,m,total}}).filter(x=>x.now>0||x.before>0).sort((a,b)=>b.m-a.m||b.now-a.now||b.total-a.total); const top=rows.slice(0,20);
+    const chart=document.getElementById('momentumChart'),r=chart.getBoundingClientRect(),dpr=Math.min(2,devicePixelRatio||1),w=Math.max(300,r.width||300),h=Math.max(260,r.height||300);chart.width=w*dpr;chart.height=h*dpr;const ctx=chart.getContext('2d');ctx.setTransform(dpr,0,0,dpr,0,0);ctx.clearRect(0,0,w,h);const shown=top.slice(0,12),pad={l:100,r:18,t:10,b:18},ph=h-pad.t-pad.b,maxM=Math.max(1,...shown.map(x=>Math.max(0,x.m)));ctx.font='8px Arial';shown.forEach((x,i)=>{const y=pad.t+(i+.5)*ph/shown.length,bh=Math.max(3,ph/shown.length*.48),bw=(w-pad.l-pad.r)*Math.max(0,x.m)/maxM;ctx.fillStyle='rgba(223,188,104,.75)';ctx.fillRect(pad.l,y-bh/2,bw,bh);ctx.fillStyle='#b9bbc0';ctx.textAlign='right';ctx.fillText(x.name,pad.l-6,y);ctx.textAlign='left';ctx.fillStyle='#797c83';ctx.fillText('+'+x.m.toFixed(2),pad.l+bw+5,y)});
+    const riser=rows[0], active=[...rows].sort((a,b)=>b.now-a.now)[0],comeback=rows.filter(x=>x.before===0&&x.now>0).sort((a,b)=>b.now-a.now)[0],cool=[...rows].sort((a,b)=>a.m-b.m)[0];const card=(k,x,v)=>`<div class="discovercard" ${x?`data-name="${esc(x.name)}"`:''}><span>${k}</span><b>${x?esc(x.name):'—'}</b><small>${x?v(x):'—'}</small></div>`;const cards=document.getElementById('momentumCards');cards.innerHTML=card('HOTTEST',riser,x=>`Δ +${x.m.toFixed(2)}`)+card('CURRENT POWER',active,x=>`直近 ${x.now.toFixed(2)}`)+card('NEW / RETURN',comeback,x=>`直近 ${x.now.toFixed(2)}`)+card('COOLING',cool,x=>`Δ ${x.m.toFixed(2)}`);wireNames(cards);
+    const wrap=document.getElementById('momentumTable');wrap.innerHTML=`<table class="discoverlist"><thead><tr><th>#</th><th>ユニット</th><th>MOMENTUM</th><th>直近3</th><th>前3</th><th>累積POWER</th></tr></thead><tbody>${rows.slice(0,40).map((x,i)=>`<tr data-name="${esc(x.name)}"><td>${i+1}</td><td><strong>${esc(x.name)}</strong></td><td><span class="metricpill ${x.m>0?'hot':x.m<0?'cool':''}">${x.m>=0?'+':''}${x.m.toFixed(2)}</span></td><td>${x.now.toFixed(2)}</td><td>${x.before.toFixed(2)}</td><td>${x.total}</td></tr>`).join('')}</tbody></table>`;wireNames(wrap);
+  }
+
+  // PATH
+  function renderPath(){
+    const c=document.getElementById('pathContest').value, years=contestYears(c), yset=new Set(years); const rows=[];
+    DB.forEach(d=>{const o=c==='m1'?(d.m1||{}):(d.koc||{}), finals=Object.entries(o).filter(([y,v])=>rv(v)>=4).map(([y])=>+y).sort((a,b)=>a-b);if(!finals.length)return;const fy=finals[0], get=(back)=>{let y=fy-back;return yset.has(y)?(o[String(y)]||null):null}; rows.push({name:d.name,finalYear:fy,p1:get(1),p2:get(2),p3:get(3),formed:+d.formed||null});});
+    const prev1=rows.map(x=>stage(x.p1)), counts={};prev1.forEach(s=>counts[s]=(counts[s]||0)+1);const total=rows.length;const ranked=Object.entries(counts).sort((a,b)=>b[1]-a[1]);document.getElementById('pathBars').innerHTML=ranked.map(([s,n])=>`<div class="pathrow"><b>${s}</b><div class="pathbar"><i style="width:${total?n/total*100:0}%"></i></div><span>${n} / ${total}</span></div>`).join('');
+    const formedRows=rows.filter(x=>x.formed&&x.finalYear>=x.formed), ages=formedRows.map(x=>x.finalYear-x.formed), avgAge=ages.length?ages.reduce((a,b)=>a+b,0)/ages.length:0, med=ages.length?[...ages].sort((a,b)=>a-b)[Math.floor(ages.length/2)]:0, direct=rows.filter(x=>!x.p1||rv(x.p1)<2).length, sfprev=rows.filter(x=>rv(x.p1)>=3).length;document.getElementById('pathCards').innerHTML=`<div class="discovercard"><span>FIRST FINALISTS</span><b>${rows.length}組</b><small>${c.toUpperCase()} 収録範囲</small></div><div class="discovercard"><span>AVG YEARS FROM FORMATION</span><b>${avgAge.toFixed(1)}年</b><small>中央値 ${med}年 / n=${ages.length}</small></div><div class="discovercard"><span>SF+ PREVIOUS YEAR</span><b>${total?(sfprev/total*100).toFixed(1):'0.0'}%</b><small>${sfprev} / ${total}</small></div><div class="discovercard"><span>NO QF+ PREVIOUS YEAR</span><b>${total?(direct/total*100).toFixed(1):0}%</b><small>${direct} / ${total}</small></div>`;
+    // histogram years from formation to first final
+    const chart=document.getElementById('pathChart'),r=chart.getBoundingClientRect(),dpr=Math.min(2,devicePixelRatio||1),w=Math.max(300,r.width||300),h=Math.max(260,r.height||300);chart.width=w*dpr;chart.height=h*dpr;const ctx=chart.getContext('2d');ctx.setTransform(dpr,0,0,dpr,0,0);ctx.clearRect(0,0,w,h);const bins=new Map();ages.forEach(a=>bins.set(a,(bins.get(a)||0)+1));const xs=[...bins.keys()].sort((a,b)=>a-b),maxN=Math.max(1,...bins.values()),pad={l:32,r:10,t:12,b:30},pw=w-pad.l-pad.r,ph=h-pad.t-pad.b;ctx.font='8px Arial';xs.forEach((a,i)=>{const bw=Math.max(4,pw/Math.max(1,xs.length)*.64),xx=pad.l+(i+.5)*pw/Math.max(1,xs.length),hh=ph*bins.get(a)/maxN;ctx.fillStyle='rgba(223,188,104,.72)';ctx.fillRect(xx-bw/2,pad.t+ph-hh,bw,hh);ctx.fillStyle='#73767d';ctx.textAlign='center';ctx.fillText(String(a),xx,h-8)});ctx.fillStyle='#777a81';ctx.textAlign='left';ctx.fillText('結成→初決勝（年）',4,10);
+    const wrap=document.getElementById('pathTable');wrap.innerHTML=`<table class="discoverlist"><thead><tr><th>ユニット</th><th>初決勝</th><th>前年</th><th>2年前</th><th>3年前</th><th>結成→初決勝</th></tr></thead><tbody>${rows.sort((a,b)=>b.finalYear-a.finalYear).map(x=>`<tr data-name="${esc(x.name)}"><td><strong>${esc(x.name)}</strong></td><td>${x.finalYear}</td><td>${stage(x.p1)}</td><td>${stage(x.p2)}</td><td>${stage(x.p3)}</td><td>${x.formed&&x.finalYear>=x.formed?(x.finalYear-x.formed)+'年':'—'}</td></tr>`).join('')}</tbody></table>`;wireNames(wrap);
+  }
+
+  // CROSSOVER
+  let crossHits=[];
+  function renderCrossover(){
+    const min=+document.getElementById('crossMin').value, rows=DB.map(d=>{const m=totalPower(d,'m1'),k=totalPower(d,'koc'),t=m+k;if(t<min||!m||!k)return null;const balance=100-Math.abs(m-k)/t*100;return{name:d.name,m,k,t,balance}}).filter(Boolean).sort((a,b)=>b.t-a.t);
+    const chart=document.getElementById('crossoverChart'),r=chart.getBoundingClientRect(),dpr=Math.min(2,devicePixelRatio||1),w=Math.max(300,r.width||300),h=Math.max(260,r.height||300);chart.width=w*dpr;chart.height=h*dpr;const ctx=chart.getContext('2d');ctx.setTransform(dpr,0,0,dpr,0,0);ctx.clearRect(0,0,w,h);crossHits=[];const pad={l:36,r:12,t:12,b:32},pw=w-pad.l-pad.r,ph=h-pad.t-pad.b,maxM=Math.max(1,...rows.map(x=>x.m)),maxK=Math.max(1,...rows.map(x=>x.k));ctx.font='8px Arial';for(let i=0;i<=4;i++){const x=pad.l+pw*i/4,y=pad.t+ph-ph*i/4;ctx.strokeStyle='#25262b';ctx.beginPath();ctx.moveTo(x,pad.t);ctx.lineTo(x,pad.t+ph);ctx.moveTo(pad.l,y);ctx.lineTo(w-pad.r,y);ctx.stroke()}const labels=new Set(rows.slice(0,8).map(x=>x.name));rows.forEach(x=>{const cx=pad.l+x.m/maxM*pw,cy=pad.t+ph-x.k/maxK*ph,rr=3+Math.sqrt(x.t/Math.max(1,rows[0]?.t||1))*7;ctx.fillStyle='rgba(223,188,104,.62)';ctx.strokeStyle='rgba(235,237,240,.4)';ctx.beginPath();ctx.arc(cx,cy,rr,0,Math.PI*2);ctx.fill();ctx.stroke();crossHits.push({x:cx,y:cy,r:rr+6,row:x});if(labels.has(x.name)){ctx.fillStyle='#aeb0b6';ctx.textAlign='left';ctx.fillText(x.name,cx+rr+3,cy)}});ctx.fillStyle='#777a81';ctx.textAlign='right';ctx.fillText('M-1 →',w-4,h-8);ctx.save();ctx.translate(8,15);ctx.rotate(-Math.PI/2);ctx.fillText('KOC →',0,0);ctx.restore();
+    const balanced=[...rows].sort((a,b)=>b.balance-a.balance||b.t-a.t)[0],power=rows[0],m1=[...rows].sort((a,b)=>b.m-a.m)[0],koc=[...rows].sort((a,b)=>b.k-a.k)[0];const card=(k,x,v)=>`<div class="discovercard" ${x?`data-name="${esc(x.name)}"`:''}><span>${k}</span><b>${x?esc(x.name):'—'}</b><small>${x?v(x):'—'}</small></div>`;const cards=document.getElementById('crossoverCards');cards.innerHTML=card('DUAL POWER',power,x=>`${x.t}pt / M${x.m} K${x.k}`)+card('MOST BALANCED',balanced,x=>`BALANCE ${x.balance.toFixed(1)}`)+card('M-1 SIDE',m1,x=>`M-1 ${x.m}pt`)+card('KOC SIDE',koc,x=>`KOC ${x.k}pt`);wireNames(cards);const wrap=document.getElementById('crossoverTable');wrap.innerHTML=`<table class="discoverlist"><thead><tr><th>#</th><th>ユニット</th><th>合計</th><th>M-1</th><th>KOC</th><th>BALANCE</th></tr></thead><tbody>${rows.slice(0,50).map((x,i)=>`<tr data-name="${esc(x.name)}"><td>${i+1}</td><td><strong>${esc(x.name)}</strong></td><td>${x.t}</td><td>${x.m}</td><td>${x.k}</td><td>${x.balance.toFixed(1)}</td></tr>`).join('')}</tbody></table>`;wireNames(wrap);
+  }
+  document.getElementById('crossoverChart')?.addEventListener('pointermove',e=>{const c=e.currentTarget,r=c.getBoundingClientRect(),x=e.clientX-r.left,y=e.clientY-r.top,p=crossHits.find(q=>Math.hypot(x-q.x,y-q.y)<=q.r),tip=document.getElementById('crossoverTip');if(!p){tip.classList.remove('show');return}const b=c.parentElement.getBoundingClientRect();tip.innerHTML=`<b>${esc(p.row.name)}</b><br>M-1 ${p.row.m} / KOC ${p.row.k}<br>合計 ${p.row.t} / BALANCE ${p.row.balance.toFixed(1)}`;tip.style.left=Math.min(e.clientX-b.left+8,b.width-200)+'px';tip.style.top=(e.clientY-b.top+8)+'px';tip.classList.add('show')});
+  document.getElementById('crossoverChart')?.addEventListener('pointerleave',()=>document.getElementById('crossoverTip').classList.remove('show'));document.getElementById('crossoverChart')?.addEventListener('click',e=>{const r=e.currentTarget.getBoundingClientRect(),x=e.clientX-r.left,y=e.clientY-r.top,p=crossHits.find(q=>Math.hypot(x-q.x,y-q.y)<=q.r);if(p)openName(p.row.name)});
+  // FORECAST
+  const forecastTargetYear=2026, forecastCutoffYear=2025;
+  const fStageValue=v=>({r3:1,qf:2,sf:3,final:5,win:6})[sk(v)]||0;
+  const clamp01=x=>Math.max(0,Math.min(1,x));
+  function forecastRows(){
+    const c=document.getElementById('forecastContest').value;
+    const years=contestYears(c).filter(y=>y<=forecastCutoffYear), recent=years.slice(-3), prev=years.slice(-6,-3), rows=[];
+    for(const d of DB){
+      if(d.activity_status==='dissolved')continue;
+      if(c==='m1' && (+d.formed||0) && +d.formed<2011)continue;
+      const obj=(c==='m1'?d.m1:d.koc)||{}, entries=Object.entries(obj).filter(([y])=>+y<=forecastCutoffYear);
+      if(!entries.length)continue;
+      const total=entries.reduce((sum,[,v])=>sum+pt(v),0), finals=entries.filter(([,v])=>rv(v)>=4).length, sfs=entries.filter(([,v])=>rv(v)>=3).length, qfs=entries.filter(([,v])=>rv(v)>=2).length;
+      const avg=(ys)=>ys.length?ys.reduce((sum,y)=>sum+fStageValue(obj[String(y)]),0)/ys.length:0;
+      const recentAvg=avg(recent), prevAvg=avg(prev), momentum=recentAvg-prevAvg, lastYear=years.length?fStageValue(obj[String(years.at(-1))]):0;
+      const streak=(level)=>{let n=0;for(let i=years.length-1;i>=0;i--){const v=obj[String(years[i])];if(v&&rv(v)>=level)n++;else break;}return n;};
+      const sfStreak=streak(3),qfStreak=streak(2),formed=+d.formed||null,careerAge=formed?forecastTargetYear-formed:null,youth=careerAge==null?.45:clamp01((15-careerAge)/12),noFinal=finals===0?1:0;
+      const finalYears=entries.filter(([,v])=>rv(v)>=4).map(([y])=>+y), finalGap=finalYears.length?forecastCutoffYear-Math.max(...finalYears):999, returnPotential=finals>0&&finalGap>=2?Math.min(1,finalGap/5):0;
+      rows.push({name:d.name,total,finals,sfs,qfs,recentAvg,prevAvg,momentum,lastYear,sfStreak,qfStreak,formed,careerAge,youth,noFinal,returnPotential});
+    }
+    const norm=key=>{const vals=rows.map(x=>x[key]),lo=Math.min(...vals),hi=Math.max(...vals);return v=>hi===lo ? .5 : clamp01((v-lo)/(hi-lo));};
+    const nTotal=norm('total'),nRecent=norm('recentAvg'),nMom=norm('momentum'),nSf=norm('sfs'),nQf=norm('qfs'),nSfStreak=norm('sfStreak'),nQfStreak=norm('qfStreak');
+    rows.forEach(x=>{
+      const finalExp=Math.min(1,x.finals/3),consistency=.6*nSf(x.sfs)+.4*nSfStreak(x.sfStreak),current=.6*nRecent(x.recentAvg)+.4*Math.min(1,x.lastYear/5);
+      x.safe=100*(.34*nTotal(x.total)+.26*finalExp+.22*consistency+.18*current);
+      const fresh=.55*x.noFinal+.25*x.youth+.20*x.returnPotential,momentumPos=.8*nMom(x.momentum)+(x.momentum>0?.2:0),threshold=.55*nQfStreak(x.qfStreak)+.45*nSfStreak(x.sfStreak);
+      x.rising=100*(.34*clamp01(momentumPos)+.30*threshold+.22*fresh+.14*nRecent(x.recentAvg));
+    });
+    return rows;
+  }
+  function forecastReason(x,starWeight){
+    const r=[];if(x.sfStreak>=2)r.push(`${x.sfStreak}年連続SF+`);else if(x.qfStreak>=2)r.push(`${x.qfStreak}年連続QF+`);if(x.momentum>.8)r.push('上昇中');if(x.noFinal)r.push('初決勝候補');else if(x.returnPotential>.4)r.push('再浮上候補');if(x.finals>=2&&starWeight<55)r.push(`決勝${x.finals}回`);if(x.recentAvg>=3)r.push('直近高水準');return r.slice(0,3);
+  }
+  const forecastPrev={};
+  function renderForecast(){
+    const slider=document.getElementById('forecastSlider'),star=+slider.value,safe=100-star,style=star<30?'TRACK RECORD':star>70?'RISING STARS':'BALANCED',c=document.getElementById('forecastContest').value;
+    const rows=forecastRows().map(x=>({...x,score:(safe*x.safe+star*x.rising)/100})).sort((a,b)=>b.score-a.score||b.rising-a.rising||b.safe-a.safe),top=rows.slice(0,10);
+    const currentMap=new Map(rows.map((x,i)=>[x.name,i+1]));
+    const prev=forecastPrev[c]||null, prevMap=prev?.rankMap||new Map(), prevTop=prev?.topNames||[];
+    const currentTop=top.map(x=>x.name), entered=prev?currentTop.filter(n=>!prevTop.includes(n)):[], exited=prev?prevTop.filter(n=>!currentTop.includes(n)):[];
+    const movers=prev?top.map((x,i)=>({name:x.name,now:i+1,prev:prevMap.get(x.name)||null,delta:prevMap.has(x.name)?prevMap.get(x.name)-(i+1):null})).filter(x=>x.delta!==null&&x.delta!==0).sort((a,b)=>Math.abs(b.delta)-Math.abs(a.delta)).slice(0,5):[];
+    document.getElementById('forecastStyleLabel').textContent=style;document.getElementById('forecastSliderValue').textContent=`実績 ${safe}% / 新星 ${star}%`;
+    document.getElementById('forecastWeights').innerHTML=`<div class="forecastweight"><span>TRACK RECORD</span><b>${safe}%</b></div><div class="forecastweight"><span>RISING</span><b>${star}%</b></div><div class="forecastweight"><span>候補母集団</span><b>${rows.length}組</b></div><div class="forecastweight"><span>予測年</span><b>2026</b></div>`;
+    const top20=rows.slice(0,20), finalists=top20.slice(0,10), borderline=top20.slice(10,20);
+    const cardHtml=(x,i,zone)=>{const rankNo=i+1,rs=forecastReason(x,star),pct=Math.max(4,Math.min(100,x.score)),oldRank=prevMap.get(x.name),delta=oldRank?oldRank-rankNo:null,crossIn=prev&&oldRank>10&&rankNo<=10,crossOut=prev&&oldRank<=10&&rankNo>10,deltaCls=crossIn?'new':delta>0?'up':delta<0?'down':'',deltaText=crossIn?'IN':crossOut?'OUT':delta>0?`↑${delta}`:delta<0?`↓${Math.abs(delta)}`:'—',cardCls=crossIn?'cross-in':crossOut?'cross-out':delta>0?'is-up':delta<0?'is-down':'';return`<div class="forecastpick ${zone==='finalist'?'finalist-zone':'border-zone'} ${cardCls}" data-name="${esc(x.name)}"><div class="rank">${rankNo}</div><div><b>${esc(x.name)}${prev?`<span class="forecastdelta ${deltaCls}">${deltaText}</span>`:''}</b><small>${rs.length?rs.join(' / '):'戦績バランス型'}</small><div class="forecastmeta">${x.noFinal?'<span class="forecasttag new">初決勝候補</span>':''}${x.momentum>.8?'<span class="forecasttag hot">MOMENTUM</span>':''}${x.finals?`<span class="forecasttag">FINAL ${x.finals}</span>`:''}</div><div class="forecastbar"><i style="width:${pct.toFixed(1)}%"></i></div></div><div class="forecastscore"><strong>${x.score.toFixed(1)}</strong><span>INDEX</span></div></div>`};
+    const borderGap=finalists.length&&borderline.length?Math.max(0,finalists[finalists.length-1].score-borderline[0].score):0;
+    const gapClass=borderGap<0.5?'chaos':borderGap<1.5?'close':borderGap<3?'clearish':'clear';
+    const gapLabel=borderGap<0.5?'大混戦':borderGap<1.5?'接戦':borderGap<3?'やや明確':'明確';
+    const gapPct=Math.max(4,Math.min(100,borderGap/4*100));
+    document.getElementById('forecastLineup').innerHTML=`<div class="forecastzones" style="grid-column:1/-1"><section class="forecastzone finalist"><div class="forecastzonehead"><b>FINALIST ZONE · TOP 10</b><span>現時点の決勝予想圏</span></div><div class="forecastlineup">${finalists.map((x,i)=>cardHtml(x,i,'finalist')).join('')}</div></section><div class="forecastcut"><span>10位 / 11位 BORDER</span><span class="forecastgap ${gapClass}" title="10位と11位のFORECAST INDEX差"><em>BORDER GAP</em><b>${borderGap.toFixed(2)}</b><span>${gapLabel}</span><span class="forecastgapbar"><i style="width:${gapPct.toFixed(0)}%"></i></span></span></div><section class="forecastzone borderline"><div class="forecastzonehead"><b>BORDERLINE · 11–20</b><span>スライダー次第で決勝圏に入る候補</span></div><div class="forecastlineup">${borderline.map((x,j)=>cardHtml(x,j+10,'border')).join('')}</div></section></div>`;wireNames(document.getElementById('forecastLineup'));
+    const changes=document.getElementById('forecastChanges'),groups=document.getElementById('forecastChangeGroups');
+    if(prev&&(entered.length||exited.length||movers.length)){
+      const inHtml=entered.length?`<div class="forecastchangegroup"><span>TOP10 IN</span>${entered.map(n=>`<i class="forecastchangechip in">${esc(n)}</i>`).join('')}</div>`:'';
+      const outHtml=exited.length?`<div class="forecastchangegroup"><span>TOP10 OUT</span>${exited.map(n=>`<i class="forecastchangechip out">${esc(n)}</i>`).join('')}</div>`:'';
+      const moveHtml=movers.length?`<div class="forecastchangegroup"><span>MOVE</span>${movers.map(m=>`<i class="forecastchangechip ${m.delta>0?'up':'down'}">${esc(m.name)} ${m.delta>0?'↑'+m.delta:'↓'+Math.abs(m.delta)}</i>`).join('')}</div>`:'';
+      groups.innerHTML=inHtml+outHtml+moveHtml;changes.hidden=false;
+    }else{groups.innerHTML='';changes.hidden=true;}
+    document.getElementById('forecastTable').innerHTML=`<table class="discoverlist"><thead><tr><th>#</th><th>ユニット</th><th>FORECAST</th><th>実績</th><th>新星</th><th>累積POWER</th><th>決勝</th><th>SF+</th><th>MOMENTUM</th></tr></thead><tbody>${rows.slice(0,30).map((x,i)=>{const old=prevMap.get(x.name),delta=old?old-(i+1):null;return`<tr class="${i<10?'forecast-row-finalist':i<20?'forecast-row-border':''}" data-name="${esc(x.name)}"><td>${i+1}${prev&&delta?` <span class="forecastdelta ${delta>0?'up':'down'}">${delta>0?'↑'+delta:'↓'+Math.abs(delta)}</span>`:''}</td><td><strong>${esc(x.name)}</strong></td><td><span class="metricpill ${i<10?'hot':''}">${x.score.toFixed(1)}</span></td><td>${x.safe.toFixed(1)}</td><td>${x.rising.toFixed(1)}</td><td>${x.total}</td><td>${x.finals}</td><td>${x.sfs}</td><td>${x.momentum>=0?'+':''}${x.momentum.toFixed(2)}</td></tr>`}).join('')}</tbody></table>`;wireNames(document.getElementById('forecastTable'));
+    document.getElementById('forecastNote').innerHTML=`※ ${c==='m1'?'M-1':'KOC'} 2026を、<b>2025年まで</b>のDB戦績だけでシミュレーション。2026年の既知結果は計算から除外しています。FORECAST INDEXは確率ではなく比較用の相対指数です。${c==='m1'?'M-1はDB上の結成年が2011年以前の組を候補から除外。':''} スライダー操作時のIN / OUTは、10位↔11位の決勝ボーダーをまたいだ変化を示します。BORDER GAPは10位と11位のFORECAST INDEX差で、0に近いほど予想が割れやすい状態です。`;
+    forecastPrev[c]={topNames:currentTop,rankMap:currentMap,star};
+    renderBacktest();
+  }
+
+  function historicalForecastRows(c,targetYear){
+    const cutoff=targetYear-1, years=contestYears(c).filter(y=>y<=cutoff), recent=years.slice(-3), prev=years.slice(-6,-3), rows=[];
+    for(const d of DB){
+      if(c==='m1' && (+d.formed||0) && +d.formed<targetYear-15)continue;
+      const obj=(c==='m1'?d.m1:d.koc)||{}, entries=Object.entries(obj).filter(([y])=>+y<=cutoff);
+      if(!entries.length)continue;
+      const total=entries.reduce((sum,[,v])=>sum+pt(v),0), finals=entries.filter(([,v])=>rv(v)>=4).length, sfs=entries.filter(([,v])=>rv(v)>=3).length, qfs=entries.filter(([,v])=>rv(v)>=2).length;
+      const avg=ys=>ys.length?ys.reduce((sum,y)=>sum+fStageValue(obj[String(y)]),0)/ys.length:0;
+      const recentAvg=avg(recent),prevAvg=avg(prev),momentum=recentAvg-prevAvg,lastYear=years.length?fStageValue(obj[String(years.at(-1))]):0;
+      const streak=level=>{let n=0;for(let i=years.length-1;i>=0;i--){const v=obj[String(years[i])];if(v&&rv(v)>=level)n++;else break;}return n};
+      const sfStreak=streak(3),qfStreak=streak(2),formed=+d.formed||null,careerAge=formed?targetYear-formed:null,youth=careerAge==null?.45:clamp01((15-careerAge)/12),noFinal=finals===0?1:0;
+      const finalYears=entries.filter(([,v])=>rv(v)>=4).map(([y])=>+y),finalGap=finalYears.length?cutoff-Math.max(...finalYears):999,returnPotential=finals>0&&finalGap>=2?Math.min(1,finalGap/5):0;
+      rows.push({name:d.name,total,finals,sfs,qfs,recentAvg,prevAvg,momentum,lastYear,sfStreak,qfStreak,formed,careerAge,youth,noFinal,returnPotential});
+    }
+    if(!rows.length)return rows;
+    const norm=key=>{const vals=rows.map(x=>x[key]),lo=Math.min(...vals),hi=Math.max(...vals);return v=>hi===lo?.5:clamp01((v-lo)/(hi-lo))};
+    const nTotal=norm('total'),nRecent=norm('recentAvg'),nMom=norm('momentum'),nSf=norm('sfs'),nQf=norm('qfs'),nSfStreak=norm('sfStreak'),nQfStreak=norm('qfStreak');
+    rows.forEach(x=>{
+      const finalExp=Math.min(1,x.finals/3),consistency=.6*nSf(x.sfs)+.4*nSfStreak(x.sfStreak),current=.6*nRecent(x.recentAvg)+.4*Math.min(1,x.lastYear/5);
+      x.safe=100*(.34*nTotal(x.total)+.26*finalExp+.22*consistency+.18*current);
+      const fresh=.55*x.noFinal+.25*x.youth+.20*x.returnPotential,momentumPos=.8*nMom(x.momentum)+(x.momentum>0?.2:0),threshold=.55*nQfStreak(x.qfStreak)+.45*nSfStreak(x.sfStreak);
+      x.rising=100*(.34*clamp01(momentumPos)+.30*threshold+.22*fresh+.14*nRecent(x.recentAvg));
+    });
+    return rows;
+  }
+  function renderBacktest(){
+    const c=document.getElementById('forecastContest').value,star=+document.getElementById('forecastSlider').value,safe=100-star,style=star<30?'TRACK RECORD':star>70?'RISING STARS':'BALANCED';
+    const available=contestYears(c).filter(y=>y<=2025).sort((a,b)=>b-a),targets=available.slice(0,3).sort((a,b)=>a-b),results=[];
+    for(const year of targets){
+      const ranked=historicalForecastRows(c,year).map(x=>({...x,score:(safe*x.safe+star*x.rising)/100})).sort((a,b)=>b.score-a.score||b.rising-a.rising||b.safe-a.safe);
+      const actual=DB.filter(d=>rv(((c==='m1'?d.m1:d.koc)||{})[String(year)])>=4).map(d=>d.name),actualSet=new Set(actual);
+      const top10=ranked.slice(0,10).map(x=>x.name),top20=ranked.slice(0,20).map(x=>x.name),hit10=top10.filter(n=>actualSet.has(n)),hit20=top20.filter(n=>actualSet.has(n));
+      const predictable=actual.filter(n=>ranked.some(x=>x.name===n)),missed=actual.filter(n=>!top20.includes(n));
+      results.push({year,actual,top10,top20,hit10,hit20,predictable,missed});
+    }
+    const actualN=results.reduce((s,x)=>s+x.actual.length,0),hit10N=results.reduce((s,x)=>s+x.hit10.length,0),hit20N=results.reduce((s,x)=>s+x.hit20.length,0),predictableN=results.reduce((s,x)=>s+x.predictable.length,0);
+    const pct=(n,d)=>d?(n/d*100).toFixed(1):'0.0';
+    document.getElementById('backtestStyle').textContent=style+` · 実績${safe}% / 新星${star}%`;
+    document.getElementById('backtestSummary').innerHTML=`<div class="backtestcard"><span>TOP10 HIT RATE</span><b>${pct(hit10N,actualN)}%</b><small>${hit10N} / ${actualN} finalists</small></div><div class="backtestcard"><span>TOP20 COVERAGE</span><b>${pct(hit20N,actualN)}%</b><small>${hit20N} / ${actualN}</small></div><div class="backtestcard"><span>PREDICTABLE POOL</span><b>${pct(predictableN,actualN)}%</b><small>前年までに戦績あり ${predictableN}組</small></div><div class="backtestcard"><span>TEST YEARS</span><b>${results.length}</b><small>${results.map(x=>x.year).join(' / ')}</small></div>`;
+    document.getElementById('backtestYears').innerHTML=results.map(x=>{
+      const h10=pct(x.hit10.length,x.actual.length),h20=pct(x.hit20.length,x.actual.length),hitNames=x.hit10.length?x.hit10.join(' / '):'—',miss=x.missed.length?x.missed.join(' / '):'なし';
+      return `<article class="backtestyear ${x.hit10.length===x.actual.length&&x.actual.length?'backtestperfect':''}"><div class="backtestyearhead"><b>${c==='m1'?'M-1':'KOC'} ${x.year}</b><span class="backtestscore">${x.hit10.length} / ${x.actual.length} HIT</span></div><div class="backtestmini"><div><span>TOP10 的中率</span><b>${h10}%</b></div><div><span>TOP20 捕捉率</span><b>${h20}%</b></div></div><div class="backtesthits"><strong>TOP10 HIT</strong><br>${esc(hitNames)}</div><div class="backtesthits backtestmiss"><strong>TOP20外</strong><br>${esc(miss)}</div></article>`;
+    }).join('');
+  }
+  function renderCurrent(){ if(current==='generation')renderGeneration(); else if(current==='momentum')renderMomentum(); else if(current==='path')renderPath(); else if(current==='crossover')renderCrossover(); else renderForecast(); }
+  ['genContest','momentumContest','pathContest','crossMin','forecastContest'].forEach(id=>document.getElementById(id)?.addEventListener('change',renderCurrent)); document.getElementById('forecastSlider')?.addEventListener('input',renderForecast); let rt;addEventListener('resize',()=>{if(root.classList.contains('primary-view-hidden'))return;clearTimeout(rt);rt=setTimeout(renderCurrent,120)});
+  let initial='generation';try{const s=sessionStorage.getItem('m1kocDiscoveryTab');if(info[s])initial=s}catch(e){}setTab(initial);
+  window.M1KOC_DISCOVERY={version:'v229',tabs:Object.keys(info),forecast:{target_year:2026,cutoff_year:2025,slider:true}};window.M1KOC_CHECKPOINT={...(window.M1KOC_CHECKPOINT||{}),version:'v229',focus:'forecast historical backtest / hit rate / top20 coverage',checked_at:'2026-09-14'};
+})();
+
+
+/* v230 editorial home digest */
+(()=>{
+  const totalEl=document.getElementById('edTotal');
+  if(!totalEl||!window.DB)return;
+  const score=v=>/優勝/.test(v)?15:/^決勝/.test(v)?5:/準決勝/.test(v)?3:/準々決勝/.test(v)?2:/3回戦|３回戦/.test(v)?1:0;
+  const esc=s=>String(s??'').replace(/[&<>"]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m]));
+  const hasAny=o=>o&&Object.keys(o).length>0;
+  const agencyName=d=>{const a=d.agency_key||d.agency||'';if(a==='mixed')return '複数所属';if(a==='サンミュージック')return 'サンミュージックプロダクション';if(a==='SMA NEET PROJECT')return 'SMA';return a};
+  const championCount=()=>{const set=new Set();for(const d of DB){for(const obj of [d.m1||{},d.koc||{}])for(const v of Object.values(obj))if(/優勝/.test(v))set.add(d.name)}return set.size};
+  function setStats(){
+    document.getElementById('edTotal').textContent=DB.length.toLocaleString('ja-JP');
+    document.getElementById('edM1').textContent=DB.filter(d=>hasAny(d.m1)).length.toLocaleString('ja-JP');
+    document.getElementById('edKoc').textContent=DB.filter(d=>hasAny(d.koc)).length.toLocaleString('ja-JP');
+    document.getElementById('edChamp').textContent=championCount().toLocaleString('ja-JP');
+  }
+  function agencyRows(){
+    const by=new Map();
+    for(const d of DB){
+      if(!d.agency_verified||!d.agency)continue;
+      let m1=0,koc=0,finalists=0;
+      for(const [y,v] of Object.entries(d.m1||{})){ if(+y>=2015&&+y<=2025){m1+=score(v); if(/^決勝|優勝/.test(v)) finalists++;} }
+      for(const [y,v] of Object.entries(d.koc||{})){ if(+y>=2015&&+y<=2025){koc+=score(v); if(/^決勝|優勝/.test(v)) finalists++;} }
+      const total=m1+koc; if(!total)continue;
+      const a=agencyName(d);
+      if(!by.has(a))by.set(a,{agency:a,n:0,total:0,m1:0,koc:0,finalists:0});
+      const row=by.get(a); row.n++; row.total+=total; row.m1+=m1; row.koc+=koc; row.finalists+= finalists?1:0;
+    }
+    return [...by.values()].map(r=>({...r,avg:r.n?r.total/r.n:0,finalRate:r.n?r.finalists/r.n*100:0,dna:(r.m1+r.koc)?(r.m1/(r.m1+r.koc)>=.65?'m1':r.m1/(r.m1+r.koc)<=.35?'koc':'dual'):'dual'})).sort((a,b)=>b.total-a.total||b.avg-a.avg||b.n-a.n||a.agency.localeCompare(b.agency,'ja'));
+  }
+  function renderAgencyRank(rows){
+    const ol=document.getElementById('homeAgencyRank'); if(!ol)return;
+    const top=rows.slice(0,8), max=Math.max(1,...top.map(r=>r.total));
+    ol.innerHTML=top.map((r,i)=>`<li><span class="no">${String(i+1).padStart(2,'0')}</span><span class="name">${esc(r.agency)}</span><span class="bar"><i style="width:${(r.total/max*100).toFixed(1)}%"></i></span><span class="pt">${r.total}</span></li>`).join('');
+  }
+  let homeHits=[];
+  function drawAgencyPreview(rows){
+    const canvas=document.getElementById('homeAgencyCanvas'); if(!canvas)return;
+    const rect=canvas.getBoundingClientRect(), dpr=Math.min(2,window.devicePixelRatio||1), w=Math.max(320,rect.width||320), h=Math.max(260,rect.height||360);
+    canvas.width=w*dpr; canvas.height=h*dpr; const ctx=canvas.getContext('2d'); ctx.setTransform(dpr,0,0,dpr,0,0); ctx.clearRect(0,0,w,h);
+    const shown=rows.slice(0,18), pad={l:34,r:12,t:16,b:28}, pw=w-pad.l-pad.r, ph=h-pad.t-pad.b, maxN=Math.max(1,...shown.map(r=>r.n)), maxY=Math.max(1,...shown.map(r=>r.avg)), maxT=Math.max(1,...shown.map(r=>r.total));
+    homeHits=[]; ctx.font='8px Arial'; ctx.textBaseline='middle';
+    for(let i=0;i<=4;i++){ const yy=pad.t+ph-ph*i/4; ctx.strokeStyle='rgba(255,255,255,.08)'; ctx.beginPath(); ctx.moveTo(pad.l,yy); ctx.lineTo(w-pad.r,yy); ctx.stroke(); if(i<4){ctx.fillStyle='#646971'; ctx.textAlign='right'; ctx.fillText((maxY*i/4).toFixed(1),pad.l-6,yy);} }
+    for(let i=0;i<=4;i++){ const xx=pad.l+pw*i/4; ctx.strokeStyle='rgba(255,255,255,.05)'; ctx.beginPath(); ctx.moveTo(xx,pad.t); ctx.lineTo(xx,pad.t+ph); ctx.stroke(); ctx.fillStyle='#646971'; ctx.textAlign='center'; ctx.fillText(String(Math.round(maxN*i/4)),xx,h-pad.b+12); }
+    ctx.fillStyle='#767b83'; ctx.textAlign='left'; ctx.fillText('AVG POWER',4,10); ctx.textAlign='right'; ctx.fillText('TEAMS',w-2,h-10);
+    const labelSet=new Set(shown.slice(0,7).map(r=>r.agency));
+    shown.forEach(r=>{ const x=pad.l+pw*(r.n/maxN), y=pad.t+ph-ph*(r.avg/maxY), rr=4+Math.sqrt(r.total/maxT)*13; const color=r.dna==='m1'?'rgba(239,90,84,.58)':r.dna==='koc'?'rgba(107,165,223,.58)':'rgba(223,188,104,.62)'; ctx.fillStyle=color; ctx.strokeStyle='rgba(245,245,245,.62)'; ctx.lineWidth=1; ctx.beginPath(); ctx.arc(x,y,rr,0,Math.PI*2); ctx.fill(); ctx.stroke(); homeHits.push({x,y,r:rr+6,row:r}); if(labelSet.has(r.agency)){ ctx.fillStyle='#b9bcc2'; ctx.textAlign='left'; ctx.fillText(r.agency,x+rr+4,y);} });
+  }
+  function hitHome(e){ const canvas=document.getElementById('homeAgencyCanvas'); if(!canvas)return null; const r=canvas.getBoundingClientRect(),x=e.clientX-r.left,y=e.clientY-r.top; return homeHits.find(p=>Math.hypot(x-p.x,y-p.y)<=p.r); }
+  function bindAgencyPreviewTip(){
+    const canvas=document.getElementById('homeAgencyCanvas'), tip=document.getElementById('homeAgencyTip'); if(!canvas||!tip)return;
+    canvas.onpointermove=e=>{ const p=hitHome(e); if(!p){tip.classList.remove('show'); return;} const r=canvas.parentElement.getBoundingClientRect(); tip.innerHTML=`<b>${esc(p.row.agency)}</b><br>POWER ${p.row.total}pt / AVG ${p.row.avg.toFixed(2)}<br>TEAMS ${p.row.n} / FINALISTS ${p.row.finalists}<br><span style="color:#8a8e95">クリックでAGENCYへ</span>`; tip.style.left=Math.min(e.clientX-r.left+12, r.width-190)+'px'; tip.style.top=(e.clientY-r.top+8)+'px'; tip.classList.add('show'); };
+    canvas.onpointerleave=()=>tip.classList.remove('show');
+    canvas.onclick=e=>{ if(!hitHome(e))return; if(window.M1KOC_PRIMARY_VIEW?.set) window.M1KOC_PRIMARY_VIEW.set('agency',true); };
+  }
+  function formedYear(d){ const y=parseInt(String(d.formed||'').slice(0,4),10); return Number.isFinite(y)?y:null; }
+  function eligible(d,contest,targetYear){ if(contest!=='m1') return true; const y=formedYear(d); return y? y>=targetYear-15 : true; }
+  function forecastPool(contest,targetYear,bias){
+    const list=[];
+    for(const d of DB){
+      if(!eligible(d,contest,targetYear)) continue;
+      const rec=d[contest]||{}; const years=Object.keys(rec).map(Number).filter(y=>y<targetYear); if(!years.length) continue;
+      let total=0, recency=0, recent3=0, prev3=0, sf=0, finals=0, qf=0, best=0, recentSfStreak=0;
+      for(const y of years){ const v=rec[String(y)], pt=score(v), age=targetYear-y; total+=pt; if(age===1)recency+=pt*4; else if(age===2)recency+=pt*3; else if(age===3)recency+=pt*2; else if(age<=6)recency+=pt*1.1; else recency+=pt*.55; if(age>=1&&age<=3)recent3+=pt; if(age>=4&&age<=6)prev3+=pt; if(/準決勝|決勝|優勝/.test(v)) sf++; if(/^決勝|優勝/.test(v)) finals++; if(/準々決勝|準決勝|決勝|優勝/.test(v)) qf++; best=Math.max(best,pt); }
+      for(let y=targetYear-1;y>=Math.max(targetYear-3,2000);y--){ const v=rec[String(y)]||''; if(/準決勝|決勝|優勝/.test(v)) recentSfStreak++; else break; }
+      const momentum=recent3-prev3; const youth=(()=>{const y=formedYear(d); if(!y) return .4; const age=targetYear-y; return age<=5?1:age<=8?.75:age<=12?.35:0})();
+      const track=total + finals*7 + sf*2.1 + best*1.6 + qf*.6;
+      const rising=recency*1.05 + Math.max(0,momentum)*1.55 + (finals===0?8:0) + youth*5 + recentSfStreak*3.3;
+      const mixed=track*(1-bias)+rising*bias;
+      list.push({name:d.name,score:mixed,track,rising,total,finals,sf,qf,momentum,streak:recentSfStreak,formed:formedYear(d),contest,rec});
+    }
+    return list.sort((a,b)=>b.score-a.score||b.rising-a.rising||a.name.localeCompare(b.name,'ja'));
+  }
+  function actualFinalists(contest,year){
+    const set=new Set(); for(const d of DB){ const v=(d[contest]||{})[String(year)]||''; if(/^決勝|優勝/.test(v)) set.add(d.name); } return set;
+  }
+  function reasonText(x){ const parts=[]; if(x.streak>=3) parts.push(`${x.streak}年連続SF級`); else if(x.sf>=3) parts.push(`SF級 ${x.sf}回`); if(x.finals===0) parts.push('初決勝候補'); else if(x.finals>=1) parts.push('決勝経験'); if(x.momentum>5) parts.push('上昇中'); return parts.slice(0,2).join(' / ')||'有力候補'; }
+  function renderForecastPreview(){
+    const list=document.getElementById('homeForecastList'); if(!list) return;
+    const top=forecastPool('m1',2026,.5).slice(0,5);
+    list.innerHTML=top.map((x,i)=>`<li><span class="rank">${String(i+1).padStart(2,'0')}</span><div><div class="name">${esc(x.name)}</div><div class="meta">${esc(reasonText(x))}</div></div><span class="score">${x.score.toFixed(1)}</span></li>`).join('');
+  }
+  function renderBacktestPreview(){
+    const sum=document.getElementById('homeBacktestSummary'), tableWrap=document.getElementById('homeBacktestTable'); if(!sum||!tableWrap) return;
+    const contests=[['m1','M-1'],['koc','KOC']]; const results=[];
+    for(const [contest,label] of contests){
+      const years=[2023,2024,2025]; let hit10=0,cover20=0,totalYears=0;
+      const yearRows=[];
+      for(const y of years){
+        const actual=[...actualFinalists(contest,y)]; if(!actual.length) continue; totalYears++;
+        const pred=forecastPool(contest,y,.5); const top10=new Set(pred.slice(0,10).map(x=>x.name)); const top20=new Set(pred.slice(0,20).map(x=>x.name));
+        const hit=actual.filter(n=>top10.has(n)).length; const cover=actual.filter(n=>top20.has(n)).length; hit10+=hit; cover20+=cover; yearRows.push({year:y,hit,cover});
+      }
+      const avgHit=totalYears?hit10/totalYears:0, avgCover=totalYears?cover20/totalYears:0; results.push({contest,label,avgHit,avgCover,rows:yearRows});
+    }
+    const overall=(results.reduce((s,r)=>s+r.avgHit,0)/Math.max(results.length,1));
+    sum.innerHTML=`<div><span>AVERAGE HIT</span><b class="big">${overall.toFixed(1)}</b><b>/ 10</b></div><div><span>M-1</span><b>${results[0].avgHit.toFixed(1)} / 10</b></div><div><span>KOC</span><b>${results[1].avgHit.toFixed(1)} / 10</b></div>`;
+    tableWrap.innerHTML=`<table class="edbacktesttable"><thead><tr><th>CONTEST</th><th>AVG HIT</th><th>AVG TOP20</th><th>LATEST</th></tr></thead><tbody>${results.map(r=>`<tr><td>${r.label}</td><td>${r.avgHit.toFixed(1)} / 10</td><td>${r.avgCover.toFixed(1)} / 10</td><td>${r.rows.length?`${r.rows[r.rows.length-1].year}: ${r.rows[r.rows.length-1].hit}/10`: '—'}</td></tr>`).join('')}</tbody></table>`;
+  }
+  function renderPickups(){
+    const wrap=document.getElementById('homePickups'); if(!wrap) return;
+    const list=forecastPool('m1',2026,.76).filter(x=>x.finals===0).slice(0,3);
+    wrap.innerHTML=list.map(x=>`<div class="edpickupitem"><b>${esc(x.name)}</b><span>${esc(reasonText(x))}</span><p>直近の伸びと準決勝級の継続を高めに評価。スライダーを新星側へ寄せるほど浮上しやすい候補です。</p></div>`).join('');
+  }
+  function bindLinks(){ document.querySelectorAll('.edlink[data-go="agency"]').forEach(a=>a.onclick=e=>{e.preventDefault(); window.M1KOC_PRIMARY_VIEW?.set&&window.M1KOC_PRIMARY_VIEW.set('agency',true);}); document.querySelectorAll('.edlink[data-go="discovery"]').forEach(a=>a.onclick=e=>{e.preventDefault(); window.M1KOC_PRIMARY_VIEW?.set&&window.M1KOC_PRIMARY_VIEW.set('discovery',true);}); }
+  function render(){ const rows=agencyRows(); setStats(); renderAgencyRank(rows); drawAgencyPreview(rows); renderForecastPreview(); renderBacktestPreview(); renderPickups(); }
+  render(); bindAgencyPreviewTip(); bindLinks();
+  let rt; addEventListener('resize',()=>{ clearTimeout(rt); rt=setTimeout(()=>drawAgencyPreview(agencyRows()),120); });
+  window.M1KOC_HOME_EDITORIAL={version:'v230',sections:['stats','agency_feature','forecast_preview','backtest_preview','pickups']};
 })();
