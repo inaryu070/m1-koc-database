@@ -65,6 +65,15 @@ input,select{background:var(--panel);border:1px solid var(--line);color:white;bo
 .careerstrip{display:flex;gap:6px;flex-wrap:wrap;margin:8px 0 2px}.careerflag{font-size:9px;padding:5px 7px;border:1px solid #33353a;border-radius:3px;color:#aeb2ba;background:#111214}.careerflag.young{border-color:rgba(223,188,104,.45);color:#e4c878}.careerflag.veteran{border-color:rgba(185,164,255,.35);color:#c8baff}.careerflag.agency{border-color:rgba(107,165,223,.35);color:#9bc3eb}.careerflag.status-active{border-color:rgba(120,190,130,.34);color:#acd6b2}.careerflag.status-dissolved{border-color:rgba(239,90,84,.35);color:#ef9692}.careerflag.status-unknown{border-color:#3a3b40;color:#8d9097}.careerflag.status-mixed{border-color:rgba(223,188,104,.42);color:#e4c878}.agencydash{margin:16px 0 28px;padding:18px;border:1px solid #323338;border-radius:7px;background:linear-gradient(145deg,#141416,#0f0f11)}.agencyhead{display:flex;justify-content:space-between;gap:18px;align-items:flex-end;margin-bottom:12px}.agencyhead h2{margin:0;color:#fff;font-size:18px}.agencyhead p{margin:5px 0 0;color:#777980;font-size:9px}.agencycov{font-size:10px;color:#c6c8cc}.agencycov b{color:#e0c67f}.agencytable{width:100%;border-collapse:collapse;font-size:10px}.agencytable th,.agencytable td{padding:9px 7px;border-bottom:1px solid #26272b;text-align:right}.agencytable th:first-child,.agencytable td:first-child{text-align:left}.agencytable th{color:#74767c;font-weight:500}.agencytable td{color:#cfd1d5}.agencytable td strong{color:#fff}.agencybar{display:inline-block;height:5px;min-width:2px;border-radius:3px;background:#6d6e74;vertical-align:middle;margin-left:7px}.agencywarn{margin-top:10px;color:#73757b;font-size:9px;line-height:1.6}.agencyfilter{min-width:180px}.careerlegend{margin-top:8px;color:#6f7176;font-size:9px;line-height:1.55}
 @media(max-width:560px){.agencydash{padding:12px;overflow:auto}.agencyhead{align-items:flex-start;flex-direction:column}.agencytable{min-width:560px}.finderrow.careerrow{grid-template-columns:1fr 1fr}.finderrow.careerrow .finderlabel{grid-column:1/-1}.agencyfilter{min-width:0}}
 
+
+/* v217 top-level section tabs */
+.primarytabs{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin:6px 0 24px;padding:5px;border:1px solid #2b2c31;border-radius:12px;background:#0f1012}
+.primarytab{appearance:none;display:flex;align-items:center;justify-content:space-between;gap:16px;min-height:58px;padding:12px 16px;border:1px solid transparent;border-radius:8px;background:transparent;color:#8d9097;text-align:left;font:inherit;cursor:pointer;transition:.16s ease}
+.primarytab:hover{background:#16171a;color:#dfe1e5}.primarytab.on{background:#202126;border-color:#373940;color:#fff}
+.primarytab strong{display:block;font-size:11px;letter-spacing:.11em}.primarytab span{display:block;margin-top:4px;color:#6f7279;font-size:9px;line-height:1.45}.primarytab.on span{color:#a5a8af}.primarytab i{font-style:normal;color:#d8bb73;font-size:17px}
+#agencyTabs{scroll-margin-top:82px}#search{scroll-margin-top:82px}
+@media(max-width:560px){.primarytabs{margin:2px 0 18px;padding:4px}.primarytab{min-height:52px;padding:10px 11px;gap:8px}.primarytab strong{font-size:10px}.primarytab span{font-size:8px}.primarytab i{font-size:15px}}
+
 /* v216 compact agency tabs + lighter initial render */
 .card{content-visibility:auto;contain-intrinsic-size:320px}.agencydash,.agencyevo{content-visibility:auto;contain-intrinsic-size:700px}
 .agencytabs{display:flex;gap:6px;margin:24px 0 8px;padding:4px;border:1px solid #2b2c31;border-radius:10px;background:#101114;position:sticky;top:8px;z-index:12;backdrop-filter:blur(10px)}
@@ -72,8 +81,16 @@ input,select{background:var(--panel);border:1px solid var(--line);color:white;bo
 .agencytab:hover{color:#d5d7dc;background:#17181c}.agencytab.on{color:#f1f1f2;background:#232429;box-shadow:inset 0 0 0 1px #35373d}
 .agencypanel[hidden]{display:none!important}
 @media(max-width:560px){.agencytabs{margin-top:18px;top:6px}.agencytab{flex:1;padding:10px 8px;font-size:9px}.agencydash,.agencyevo{margin-top:8px}}
+
+/* v218 primary content tabs: DATABASE / AGENCY as true views */
+.primary-view-hidden{display:none!important}
+.primarytabs{position:sticky;top:8px;z-index:18;backdrop-filter:blur(12px);box-shadow:0 12px 32px rgba(0,0,0,.14)}
+.primarytab.on{box-shadow:inset 0 0 0 1px rgba(216,187,115,.10)}
+.primary-view-note{margin:-14px 0 20px;color:#656970;font-size:9px;line-height:1.55}
+body.primary-agency .primary-view-note.database-note,body.primary-database .primary-view-note.agency-note{display:none}
+@media(max-width:560px){.primarytabs{top:6px}.primary-view-note{margin:-10px 2px 16px;font-size:8px}}
 </style>
-<meta name="data-release" content="public-ui-2026-09-14-v214">
+<meta name="data-release" content="public-ui-2026-09-14-v217">
 
 <style>
 /* v82 — public UI final polish */
@@ -253,10 +270,17 @@ button,select,input{touch-action:manipulation}
   <button class="cover-skip" id="coverSkip" type="button">SKIP</button>
 </section>
 <div class="wrap">
-<header class="sitehead"><a class="brand" href="#top">M-1 × KOC DATABASE</a><nav class="nav"><a href="#search">SEARCH</a><a href="#about">ABOUT</a></nav></header>
+<header class="sitehead"><a class="brand" href="#top">M-1 × KOC DATABASE</a><nav class="nav"><a href="#search">SEARCH</a><a href="#agencyTabs">AGENCY</a><a href="#about">ABOUT</a></nav></header>
 <main id="top"><section class="hero"><div><div class="eyebrow">COMEDY COMPETITION DATABASE / LAST UPDATE 2026-09-14</div>
 <h1>M-1 × KOC<br>戦績データベース</h1>
 <p class="lead">M-1とキングオブコントの主要戦績を横断。ランキング、NEXT STAR、二刀流、継続性まで一つのDBで探せます。</p></div><aside class="heroaside"><b id="heroCount">1,747</b><span>収録コンビ。M-1 × KOCを横断して検索・比較できます。</span></aside></section>
+
+<div class="primarytabs" id="primaryTabs" role="tablist" aria-label="主要コンテンツ">
+  <button class="primarytab on" id="primaryTabDatabase" type="button" role="tab" aria-selected="true" data-primary-target="database"><span><strong>DATABASE</strong><span>コンビ検索・ランキング・NEXT STAR</span></span><i>↘</i></button>
+  <button class="primarytab" id="primaryTabAgency" type="button" role="tab" aria-selected="false" data-primary-target="agency"><span><strong>AGENCY ANALYSIS</strong><span>事務所POWER・勢力変遷・M-1 / KOC DNA</span></span><i>↘</i></button>
+</div>
+<p class="primary-view-note database-note">DATABASE VIEW — コンビ検索、ランキング、NEXT STARを表示中。</p>
+<p class="primary-view-note agency-note">AGENCY VIEW — 事務所POWERと勢力変遷だけを表示。上のタブでいつでもDATABASEへ戻れます。</p>
 
 <div class="coverage"><span class="cov m1">M-1 2001–2010 準決勝以上</span><span class="cov m1">M-1 2015–2025 3回戦以上</span><span class="cov m1">2020年は準々決勝以上</span><span class="cov seed">M-1 2026 シード資格</span><span class="cov koc">KOC 2008–2016 準決勝以上</span><span class="cov koc">KOC 2017–2025 準々決勝以上</span><span class="cov koc">KOC 2026 準決勝以上（9/10更新）</span></div>
 <div class="scoring"><b>SCORING</b><span>3回戦 <i>1</i></span><span>準々決勝 <i>2</i></span><span>準決勝 <i>3</i></span><span>決勝 <i>5</i></span><span>優勝 <i>15 pt</i></span><span>ラウンド限定・未経験者解析に対応</span></div>
@@ -308,7 +332,7 @@ button,select,input{touch-action:manipulation}
 
 
 
-<div class="release-note" aria-label="データ更新情報"><span><b>DATA v216</b></span><span>総収録 1,747組</span><span>所属確認 1,742組 / 99.7%</span><span>所属UNRESOLVED 5組</span><span>構造監査 0件</span><span>KOC 2026: 9/10決勝・敗者復活発表反映</span></div>
+<div class="release-note" aria-label="データ更新情報"><span><b>DATA v218</b></span><span>総収録 1,747組</span><span>所属確認 1,742組 / 99.7%</span><span>所属UNRESOLVED 5組</span><span>構造監査 0件</span><span>KOC 2026: 9/10決勝・敗者復活発表反映</span></div>
 
 <div class="career-tier-note" style="margin-top:12px;padding:12px 14px;border:1px solid var(--line);border-radius:12px;color:#777b84;font-size:10px;line-height:1.7">
   若手判定は<b style="color:#ddd">コンビ結成年</b>を主指標にしています。

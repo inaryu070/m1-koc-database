@@ -962,4 +962,46 @@ window.M1KOC_AGENCY_COVERAGE_FIX={version:'v215',checked_at:'2026-09-14',method:
   window.M1KOC_UI_OPTIMIZATION={version:'v216',agency_tabs:true,lazy_agency_evolution:true,initial_cards:{mobile:32,desktop:80}};
 })();
 
-window.M1KOC_CHECKPOINT={...(window.M1KOC_CHECKPOINT||{}),version:'v216',focus:'agency tabs + lazy evolution + lighter initial list render',checked_at:'2026-09-14'};
+window.M1KOC_CHECKPOINT={...(window.M1KOC_CHECKPOINT||{}),version:'v218',focus:'true DATABASE / AGENCY top-level tabs + reduced visible DOM',checked_at:'2026-09-14'};
+
+
+/* v218 top-level DATABASE / AGENCY true view tabs */
+(()=>{
+  const tabs=document.getElementById('primaryTabs');
+  if(!tabs)return;
+  const buttons=[...tabs.querySelectorAll('[data-primary-target]')];
+  const dbSelectors=['.nextstar.nextstar-v2','.featurebar','#search','.sectionlabel','.stats','#grid','#comparebar','#about','#analytics'];
+  const agencySelectors=['#agencyTabs','#agencyDashboard','#agencyEvolution'];
+  const els=(selectors)=>selectors.flatMap(sel=>[...document.querySelectorAll(sel)]);
+  const dbEls=els(dbSelectors), agencyEls=els(agencySelectors);
+  const setHidden=(list,hidden)=>list.forEach(el=>el.classList.toggle('primary-view-hidden',hidden));
+  const setPrimary=(name,scroll=true)=>{
+    const agency=name==='agency';
+    document.body.classList.toggle('primary-agency',agency);
+    document.body.classList.toggle('primary-database',!agency);
+    setHidden(dbEls,agency);
+    setHidden(agencyEls,!agency);
+    for(const b of buttons){
+      const on=b.dataset.primaryTarget===name;
+      b.classList.toggle('on',on);
+      b.setAttribute('aria-selected',on?'true':'false');
+    }
+    if(agency){
+      const power=document.getElementById('agencyTabPower');
+      if(power && power.getAttribute('aria-selected')!=='true') power.click();
+      requestAnimationFrame(()=>{
+        try{window.dispatchEvent(new Event('resize'))}catch(_e){}
+      });
+    }
+    try{history.replaceState(null,'',agency?'#agency':'#database')}catch(_e){}
+    if(scroll)document.getElementById('primaryTabs')?.scrollIntoView({behavior:'smooth',block:'start'});
+  };
+  tabs.addEventListener('click',e=>{
+    const b=e.target.closest('[data-primary-target]');
+    if(b)setPrimary(b.dataset.primaryTarget,true);
+  });
+  document.querySelector('.sitehead .nav a[href="#agencyTabs"]')?.addEventListener('click',e=>{e.preventDefault();setPrimary('agency',true)});
+  document.querySelector('.sitehead .nav a[href="#search"]')?.addEventListener('click',e=>{e.preventDefault();setPrimary('database',true)});
+  setPrimary(location.hash==='#agency'?'agency':'database',false);
+  window.M1KOC_PRIMARY_VIEW={set:setPrimary,version:'v218'};
+})();
