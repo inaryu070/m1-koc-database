@@ -1365,6 +1365,10 @@ window.M1KOC_RUNTIME_FIX={version:'v238',fix:'shared agencyCanonical for v219+ a
       if(c==='m1' && (+d.formed||0) && +d.formed<2011)continue;
       const obj=(c==='m1'?d.m1:d.koc)||{}, entries=Object.entries(obj).filter(([y])=>+y<=forecastCutoffYear);
       if(!entries.length)continue;
+      // FINALIST FORECAST excludes past champions of the selected contest.
+      // A backtest must only know results available before its target year, so this
+      // current-year view checks wins through the 2025 cutoff only.
+      if(entries.some(([,v])=>sk(v)==='win'))continue;
       const total=entries.reduce((sum,[,v])=>sum+pt(v),0), finals=entries.filter(([,v])=>rv(v)>=4).length, sfs=entries.filter(([,v])=>rv(v)>=3).length, qfs=entries.filter(([,v])=>rv(v)>=2).length;
       const avg=(ys)=>ys.length?ys.reduce((sum,y)=>sum+fStageValue(obj[String(y)]),0)/ys.length:0;
       const recentAvg=avg(recent), prevAvg=avg(prev), momentum=recentAvg-prevAvg, lastYear=years.length?fStageValue(obj[String(years.at(-1))]):0;
@@ -1411,7 +1415,7 @@ window.M1KOC_RUNTIME_FIX={version:'v238',fix:'shared agencyCanonical for v219+ a
       groups.innerHTML=inHtml+outHtml+moveHtml;changes.hidden=false;
     }else{groups.innerHTML='';changes.hidden=true;}
     document.getElementById('forecastTable').innerHTML=`<table class="discoverlist"><thead><tr><th>#</th><th>ユニット</th><th>FORECAST</th><th>実績</th><th>新星</th><th>累積POWER</th><th>決勝</th><th>SF+</th><th>MOMENTUM</th></tr></thead><tbody>${rows.slice(0,30).map((x,i)=>{const old=prevMap.get(x.name),delta=old?old-(i+1):null;return`<tr class="${i<10?'forecast-row-finalist':i<20?'forecast-row-border':''}" data-name="${esc(x.name)}"><td>${i+1}${prev&&delta?` <span class="forecastdelta ${delta>0?'up':'down'}">${delta>0?'↑'+delta:'↓'+Math.abs(delta)}</span>`:''}</td><td><strong>${esc(x.name)}</strong></td><td><span class="metricpill ${i<10?'hot':''}">${x.score.toFixed(1)}</span></td><td>${x.safe.toFixed(1)}</td><td>${x.rising.toFixed(1)}</td><td>${x.total}</td><td>${x.finals}</td><td>${x.sfs}</td><td>${x.momentum>=0?'+':''}${x.momentum.toFixed(2)}</td></tr>`}).join('')}</tbody></table>`;wireNames(document.getElementById('forecastTable'));
-    document.getElementById('forecastNote').innerHTML=`※ ${c==='m1'?'M-1':'KOC'} 2026を、<b>2025年まで</b>のDB戦績だけでシミュレーション。2026年の既知結果は計算から除外しています。FORECAST INDEXは確率ではなく比較用の相対指数です。${c==='m1'?'M-1はDB上の結成年が2011年以前の組を候補から除外。':''} スライダー操作時のIN / OUTは、10位↔11位の決勝ボーダーをまたいだ変化を示します。BORDER GAPは10位と11位のFORECAST INDEX差で、0に近いほど予想が割れやすい状態です。`;
+    document.getElementById('forecastNote').innerHTML=`※ ${c==='m1'?'M-1':'KOC'} 2026を、<b>2025年まで</b>のDB戦績だけでシミュレーション。2026年の既知結果は計算から除外しています。<b>${c==='m1'?'M-1':'KOC'}歴代優勝者は候補から除外</b>しています。FORECAST INDEXは確率ではなく比較用の相対指数です。${c==='m1'?'M-1はDB上の結成年が2011年以前の組も候補から除外。':''} スライダー操作時のIN / OUTは、10位↔11位の決勝ボーダーをまたいだ変化を示します。BORDER GAPは10位と11位のFORECAST INDEX差で、0に近いほど予想が割れやすい状態です。`;
     forecastPrev[c]={topNames:currentTop,rankMap:currentMap,star};
     renderBacktest();
   }
@@ -1463,7 +1467,7 @@ window.M1KOC_RUNTIME_FIX={version:'v238',fix:'shared agencyCanonical for v219+ a
   function renderCurrent(){ if(current==='generation')renderGeneration(); else if(current==='momentum')renderMomentum(); else if(current==='path')renderPath(); else if(current==='crossover')renderCrossover(); else renderForecast(); }
   ['genContest','momentumContest','pathContest','crossMin','forecastContest'].forEach(id=>document.getElementById(id)?.addEventListener('change',renderCurrent)); document.getElementById('forecastSlider')?.addEventListener('input',renderForecast); let rt;addEventListener('resize',()=>{if(root.classList.contains('primary-view-hidden'))return;clearTimeout(rt);rt=setTimeout(renderCurrent,120)});
   let initial='generation';try{const s=sessionStorage.getItem('m1kocDiscoveryTab');if(info[s])initial=s}catch(e){}setTab(initial);
-  window.M1KOC_DISCOVERY={version:'v229',tabs:Object.keys(info),forecast:{target_year:2026,cutoff_year:2025,slider:true}};window.M1KOC_CHECKPOINT={...(window.M1KOC_CHECKPOINT||{}),version:'v229',focus:'forecast historical backtest / hit rate / top20 coverage',checked_at:'2026-09-14'};
+  window.M1KOC_DISCOVERY={version:'v248',tabs:Object.keys(info),forecast:{target_year:2026,cutoff_year:2025,slider:true}};window.M1KOC_CHECKPOINT={...(window.M1KOC_CHECKPOINT||{}),version:'v229',focus:'forecast historical backtest / hit rate / top20 coverage',checked_at:'2026-09-14'};
 })();
 
 
@@ -1529,6 +1533,10 @@ window.M1KOC_RUNTIME_FIX={version:'v238',fix:'shared agencyCanonical for v219+ a
     for(const d of DB){
       if(!eligible(d,contest,targetYear)) continue;
       const rec=d[contest]||{}; const years=Object.keys(rec).map(Number).filter(y=>y<targetYear); if(!years.length) continue;
+      // Exclude only champions already crowned before the prediction target year.
+      // This keeps historical backtests honest: the eventual winner of that target
+      // year remains eligible if they had not won the contest before then.
+      if(years.some(y=>/優勝/.test(String(rec[String(y)]||'')))) continue;
       let total=0, recency=0, recent3=0, prev3=0, sf=0, finals=0, qf=0, best=0, recentSfStreak=0;
       for(const y of years){ const v=rec[String(y)], pt=score(v), age=targetYear-y; total+=pt; if(age===1)recency+=pt*4; else if(age===2)recency+=pt*3; else if(age===3)recency+=pt*2; else if(age<=6)recency+=pt*1.1; else recency+=pt*.55; if(age>=1&&age<=3)recent3+=pt; if(age>=4&&age<=6)prev3+=pt; if(/準決勝|決勝|優勝/.test(v)) sf++; if(/^決勝|優勝/.test(v)) finals++; if(/準々決勝|準決勝|決勝|優勝/.test(v)) qf++; best=Math.max(best,pt); }
       for(let y=targetYear-1;y>=Math.max(targetYear-3,2000);y--){ const v=rec[String(y)]||''; if(/準決勝|決勝|優勝/.test(v)) recentSfStreak++; else break; }
@@ -1968,3 +1976,75 @@ window.M1KOC_CHECKPOINT={...(window.M1KOC_CHECKPOINT||{}),version:'v241',focus:'
 window.M1KOC_CHECKPOINT={...(window.M1KOC_CHECKPOINT||{}),version:'v246',focus:'single cover controller + mobile performance reset',checked_at:'2026-09-15'};
 
 window.M1KOC_CHECKPOINT={...(window.M1KOC_CHECKPOINT||{}),version:"v247",focus:"deferred app boot + strict iPhone cover",checked_at:"2026-09-15"};
+
+/* v248: finalist forecasts exclude past champions of the selected contest. */
+window.M1KOC_CHECKPOINT={...(window.M1KOC_CHECKPOINT||{}),version:'v248',focus:'exclude prior M-1/KOC champions from finalist forecast and historical backtests',checked_at:'2026-09-15'};
+
+
+/* v249 M-1 LAST YEAR browser */
+(()=>{
+  if(typeof DB==='undefined')return;
+  const body=document.body;
+  const panel=document.getElementById('lastYearPanel');
+  const modebar=document.getElementById('nextstarModebar');
+  if(!panel||!modebar)return;
+  const yearsEl=document.getElementById('lastYearYears');
+  const select=document.getElementById('lastYearSelect');
+  const sort=document.getElementById('lastYearSort');
+  const activeCheck=document.getElementById('lastYearActive');
+  const list=document.getElementById('lastYearList');
+  const feature=document.getElementById('lastYearFeature');
+  const summary=document.getElementById('lastYearSummary');
+  const countEl=document.getElementById('lastYearCount');
+  const big=document.getElementById('lastYearBig');
+  const formedEl=document.getElementById('lastYearFormed');
+  const state={year:2026,scope:'m1'};
+  const YEARS=Array.from({length:15},(_,i)=>2026+i);
+  const score=v=>/優勝/.test(v)?15:/^決勝/.test(v)?5:/準決勝/.test(v)?3:/準々決勝/.test(v)?2:/3回戦|３回戦/.test(v)?1:0;
+  const esc=s=>String(s??'').replace(/[&<>\"]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m]));
+  const formedYear=d=>{const m=String(d.formed||'').match(/(19|20)\d{2}/);return m?+m[0]:null};
+  const m1Power=d=>Object.values(d.m1||{}).reduce((a,v)=>a+score(v),0);
+  const latestM1=d=>Math.max(0,...Object.keys(d.m1||{}).map(Number).filter(Number.isFinite));
+  const bestM1=d=>{const vals=Object.values(d.m1||{}); if(!vals.length)return '—'; return vals.slice().sort((a,b)=>score(b)-score(a))[0]};
+  const status=d=>{if(d.activity_status==='dissolved')return 'dissolved';if(d.activity_status==='active'||d.activity_status==='mixed'||d.activity_verified||d.recent_activity_verified||(+d.recent_activity_year>=2024))return 'active';return 'unknown'};
+  const eligibleRow=d=>formedYear(d)===state.year-15 && (state.scope==='all'||Object.keys(d.m1||{}).length>0) && (!activeCheck.checked||status(d)!=='dissolved');
+  const rows=()=>DB.filter(eligibleRow);
+  const sortRows=arr=>arr.sort((a,b)=>{
+    if(sort.value==='name')return a.name.localeCompare(b.name,'ja');
+    if(sort.value==='recent')return latestM1(b)-latestM1(a)||m1Power(b)-m1Power(a)||a.name.localeCompare(b.name,'ja');
+    return m1Power(b)-m1Power(a)||latestM1(b)-latestM1(a)||a.name.localeCompare(b.name,'ja');
+  });
+  function countForYear(y){return DB.filter(d=>formedYear(d)===y-15&&(state.scope==='all'||Object.keys(d.m1||{}).length>0)&&(!activeCheck.checked||status(d)!=='dissolved')).length}
+  function renderYears(){
+    select.innerHTML=YEARS.map(y=>`<option value="${y}">${y}（${y-15}年結成）</option>`).join('');select.value=state.year;
+    yearsEl.innerHTML=YEARS.map(y=>`<button type="button" class="lastyear-year ${y===state.year?'on':''}" data-lastyear-year="${y}"><b>${y}</b><span>${countForYear(y)}組</span></button>`).join('');
+    yearsEl.querySelectorAll('[data-lastyear-year]').forEach(b=>b.onclick=()=>{state.year=+b.dataset.lastyearYear;select.value=state.year;render()});
+  }
+  function render(){
+    body.classList.toggle('nextstar-mode-lastyear',body.classList.contains('nextstar-mode-lastyear'));
+    big.textContent=state.year;formedEl.textContent=`${state.year-15}年結成`;
+    const arr=sortRows(rows());
+    const verified=arr.filter(d=>d.formed_verified===true&&d.formed_research_status!=='UNRESOLVED').length;
+    const active=arr.filter(d=>status(d)==='active').length;
+    const m1ers=arr.filter(d=>Object.keys(d.m1||{}).length).length;
+    summary.innerHTML=`<div class="lastyear-stat"><small>LISTED</small><b>${arr.length}</b></div><div class="lastyear-stat"><small>FORMED VERIFIED</small><b>${verified}</b></div><div class="lastyear-stat"><small>ACTIVE / RECENT</small><b>${active}</b></div><div class="lastyear-stat"><small>M-1 RECORD</small><b>${m1ers}</b></div>`;
+    const top=arr.filter(d=>Object.keys(d.m1||{}).length).slice(0,5);
+    feature.innerHTML=top.map((d,i)=>`<article data-ly-detail="${esc(d.name)}"><span class="rank">${String(i+1).padStart(2,'0')}</span><div><h3>${esc(d.name)}</h3><p>${esc(d.agency_verified&&d.agency?d.agency:'所属未確認')} / ${esc(bestM1(d))}${d.formed_verified===false||d.formed_research_status==='UNRESOLVED'?' / 結成年暫定':''}</p></div><b>${m1Power(d)} pt</b></article>`).join('');
+    countEl.textContent=`${arr.length} UNITS`;
+    list.innerHTML=arr.length?arr.map((d,i)=>{const st=status(d);const verifiedForm=d.formed_verified===true&&d.formed_research_status!=='UNRESOLVED';return `<div class="lastyear-row" data-ly-detail="${esc(d.name)}"><span class="ly-rank">${String(i+1).padStart(2,'0')}</span><div class="ly-name"><b>${esc(d.name)}</b><span>${state.year} LAST YEAR / 結成 ${esc(d.formed||state.year-15)}年</span>${!verifiedForm?'<em class="ly-badge warn">結成年 暫定</em>':''}${st==='active'?'<em class="ly-badge active">活動確認</em>':st==='dissolved'?'<em class="ly-badge">解散確認</em>':''}</div><span class="ly-agency">${esc(d.agency_verified&&d.agency?d.agency:'所属未確認')}</span><div class="ly-cell ly-best"><small>BEST</small><b>${esc(bestM1(d))}</b></div><div class="ly-cell ly-apps"><small>APPS</small><b>${Object.keys(d.m1||{}).length}</b></div><div class="ly-cell ly-latest"><small>LATEST</small><b>${latestM1(d)||'—'}</b></div><div class="ly-cell ly-power"><small>M-1 POWER</small><b>${m1Power(d)} pt</b></div></div>`}).join(''):'<div class="lastyear-empty">該当するユニットがありません。</div>';
+    panel.querySelectorAll('[data-ly-detail]').forEach(el=>el.onclick=()=>window.M1KOC_OPEN_DETAIL?.(el.dataset.lyDetail));
+    renderYears();
+  }
+  function setMode(mode){
+    const last=mode==='lastyear';body.classList.toggle('nextstar-mode-lastyear',last);body.classList.toggle('nextstar-mode-finder',!last);
+    modebar.querySelectorAll('[data-nextstar-mode]').forEach(b=>b.classList.toggle('on',b.dataset.nextstarMode===mode));
+    if(last)render();
+  }
+  modebar.querySelectorAll('[data-nextstar-mode]').forEach(b=>b.onclick=()=>setMode(b.dataset.nextstarMode));
+  select.onchange=()=>{state.year=+select.value;render()};
+  sort.onchange=render;activeCheck.onchange=render;
+  document.querySelectorAll('[data-lastyear-scope]').forEach(b=>b.onclick=()=>{state.scope=b.dataset.lastyearScope;document.querySelectorAll('[data-lastyear-scope]').forEach(x=>x.classList.toggle('on',x===b));render()});
+  document.addEventListener('click',e=>{const t=e.target.closest('[data-priority-target="nextstar"],[data-priority-nav="nextstar"]');if(t&&!body.classList.contains('nextstar-mode-lastyear'))setMode('finder')},true);
+  setMode('finder');renderYears();
+  window.M1KOC_LAST_YEAR={setYear:y=>{if(YEARS.includes(+y)){state.year=+y;setMode('lastyear');render()}},version:'v249'};
+})();
