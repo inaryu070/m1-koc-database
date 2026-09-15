@@ -1786,7 +1786,7 @@ window.M1KOC_RUNTIME_FIX={version:'v238',fix:'shared agencyCanonical for v219+ a
     const home=e.target.closest('[data-priority-home]');
     if(home){
       e.preventDefault();
-      if(window.M1KOC_COVER?.open)window.M1KOC_COVER.open();
+      if(window.M1KOC_GATE?.open)window.M1KOC_GATE.open(); else if(window.M1KOC_COVER?.open)window.M1KOC_COVER.open();
       else window.scrollTo({top:0,behavior:'auto'});
       return
     }
@@ -1966,3 +1966,5 @@ window.M1KOC_CHECKPOINT={...(window.M1KOC_CHECKPOINT||{}),version:'v241',focus:'
 
 /* v246 — legacy cover controllers removed; core.js is sole cover controller */
 window.M1KOC_CHECKPOINT={...(window.M1KOC_CHECKPOINT||{}),version:'v246',focus:'single cover controller + mobile performance reset',checked_at:'2026-09-15'};
+
+window.M1KOC_CHECKPOINT={...(window.M1KOC_CHECKPOINT||{}),version:"v247",focus:"deferred app boot + strict iPhone cover",checked_at:"2026-09-15"};

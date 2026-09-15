@@ -2070,13 +2070,9 @@ for(const [nm,meta] of Object.entries(FORMED_YEAR_6LANE_V123)){
 }
 
 const BONUS_BY_NAME=new Map();for(const r of BONUS_RECORDS){const k=normName(r.name);if(!BONUS_BY_NAME.has(k))BONUS_BY_NAME.set(k,[]);BONUS_BY_NAME.get(k).push(r)}
-const cover=document.getElementById("cover"),coverEnter=document.getElementById("coverEnter"),coverSkip=document.getElementById("coverSkip"),coverCount=document.getElementById("coverCount");
-coverCount.textContent=DB.length.toLocaleString("ja-JP")+" TEAMS";
-function closeCover(){if(!cover)return;cover.classList.add("is-hidden");cover.setAttribute("aria-hidden","true");cover.style.display="none";document.body.classList.remove("cover-open");document.body.style.overflow="";window.scrollTo(0,0)}
-function openCover(){if(!cover)return;cover.style.display="grid";cover.classList.remove("is-hidden");cover.setAttribute("aria-hidden","false");document.body.classList.add("cover-open");window.scrollTo(0,0)}
-coverEnter?.addEventListener("click",closeCover);coverSkip?.addEventListener("click",closeCover);
-document.addEventListener("keydown",e=>{if(document.body.classList.contains("cover-open")&&(e.key==="Enter"||e.key==="Escape"))closeCover()});
-window.M1KOC_COVER={open:openCover,close:closeCover,version:"v246"};
+const cover=document.getElementById("cover"),coverCount=document.getElementById("coverCount");
+if(coverCount)coverCount.textContent=DB.length.toLocaleString("ja-JP")+" TEAMS";
+window.M1KOC_COVER={open:()=>window.M1KOC_GATE?.open?.(),close:()=>window.M1KOC_GATE?.close?.(),version:"v247"};
 const infoDialog=document.getElementById("infoDialog"),dialogTitle=document.getElementById("dialogTitle"),dialogContent=document.getElementById("dialogContent");
 const GUIDE_CONTENT={
  score:{title:"配点について",html:`<section class="dialogsection"><h3>M-1／KOC 本体点</h3><p>到達した最高ラウンドに応じて各年度を採点します。大会規模の違いよりも、継続して上位へ進む力を見つけるための非公式指標です。</p><div class="dialogchips"><span>3回戦 1点</span><span>準々決勝 2点</span><span>準決勝 3点</span><span>決勝 5点</span><span>優勝 15点</span></div></section><section class="dialogsection"><h3>平均点</h3><p>本体点÷M-1／KOCの収録大会数です。外部賞レースボーナスは平均へ含めません。</p></section>`},

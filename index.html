@@ -779,9 +779,70 @@ body:not(.cover-open)>.wrap,body:not(.cover-open)>.ref-sidebar,body:not(.cover-o
 <div class="sharemsg" id="sharemsg" role="status" aria-live="polite" aria-atomic="true">現在の検索条件をコピーしました</div><div class="overlay" id="overlay"></div><aside class="drawer" id="drawer"><div class="inner" id="detail"></div></aside>
 <dialog class="infodialog" id="infoDialog"><div class="dialoginner"><div class="dialoghead"><b id="dialogTitle">DATABASE GUIDE</b><button class="dialogclose" id="dialogClose" type="button" aria-label="閉じる">×</button></div><div id="dialogContent"></div></div></dialog>
 
-<script src="db.js"></script>
-<script src="core.js"></script>
-<script src="patches.js"></script>
+<script id="appGateLoader">
+(()=>{
+  const body=document.body;
+  const cover=document.getElementById('cover');
+  const enter=document.getElementById('coverEnter');
+  const skip=document.getElementById('coverSkip');
+  let loadPromise=null;
+
+  function setGate(open){
+    if(!cover)return;
+    cover.hidden=!open;
+    cover.style.display=open?'grid':'none';
+    cover.classList.toggle('is-hidden',!open);
+    cover.setAttribute('aria-hidden',open?'false':'true');
+    body.classList.toggle('cover-open',open);
+    if(!open){ body.style.overflow=''; window.scrollTo(0,0); }
+  }
+
+  function loadScript(src){
+    return new Promise((resolve,reject)=>{
+      const el=document.createElement('script');
+      el.src=src; el.async=false;
+      el.onload=resolve; el.onerror=()=>reject(new Error('Failed to load '+src));
+      document.body.appendChild(el);
+    });
+  }
+
+  function showLoadError(err){
+    console.error(err);
+    let box=document.getElementById('appLoadError');
+    if(!box){
+      box=document.createElement('div'); box.id='appLoadError'; box.className='app-load-error';
+      box.innerHTML='<b>DATA LOAD ERROR</b><span>再読み込みしてください。</span>';
+      document.body.appendChild(box);
+    }
+  }
+
+  function loadApp(){
+    if(loadPromise)return loadPromise;
+    body.classList.add('app-is-loading');
+    loadPromise=(async()=>{
+      try{
+        await loadScript('db.js');
+        await loadScript('core.js');
+        await loadScript('patches.js');
+        body.classList.add('app-ready');
+      }catch(err){showLoadError(err); throw err;}
+      finally{body.classList.remove('app-is-loading');}
+    })();
+    return loadPromise;
+  }
+
+  function enterApp(e){
+    if(e){e.preventDefault();e.stopPropagation();}
+    setGate(false);
+    requestAnimationFrame(()=>requestAnimationFrame(loadApp));
+  }
+
+  enter?.addEventListener('click',enterApp,{passive:false});
+  skip?.addEventListener('click',enterApp,{passive:false});
+  window.M1KOC_GATE={open:()=>setGate(true),close:enterApp,load:loadApp,version:'v247'};
+  setGate(true);
+})();
+</script>
 
 
 
@@ -1549,6 +1610,76 @@ body:not(.cover-open) .ref-mobile-head{visibility:visible!important;pointer-even
 }
 @media(max-width:480px){
   body.editorial-ui.home-index:not(.cover-open) .hero h1{font-size:37px!important}
+}
+</style>
+
+<style id="v247-mobile-gate-fix">
+/* v247: PC cover stays intact; iPhone cover gets a strict lightweight layout. */
+.app-load-error{position:fixed;left:16px;right:16px;bottom:16px;z-index:99999;padding:14px 16px;background:#fff9f0;border:1px solid #b94d47;color:#191919;font:12px/1.5 system-ui,-apple-system,sans-serif}.app-load-error b{display:block;margin-bottom:4px}.app-load-error span{color:#6e6760}
+body.cover-open{overflow:hidden!important}
+#cover[hidden]{display:none!important}
+@media(max-width:830px){
+  html,body{min-width:0!important;overflow-x:hidden!important}
+  #cover{
+    position:fixed!important;inset:0!important;z-index:100000!important;
+    display:grid!important;grid-template-columns:1fr!important;grid-template-rows:42svh minmax(58svh,auto)!important;
+    width:100vw!important;height:100svh!important;min-height:100svh!important;
+    overflow-y:auto!important;overflow-x:hidden!important;background:#faf9f4!important;color:#151515!important;
+    opacity:1!important;visibility:visible!important;pointer-events:auto!important;
+    -webkit-overflow-scrolling:touch;overscroll-behavior:none;
+  }
+  #cover.is-hidden,#cover[hidden]{display:none!important}
+  #cover .cover-artbox{
+    grid-row:1!important;position:relative!important;width:100%!important;height:42svh!important;min-height:0!important;
+    overflow:hidden!important;background:#111!important;
+  }
+  #cover .cover-art{
+    position:absolute!important;inset:0!important;width:100%!important;height:100%!important;
+    object-fit:cover!important;object-position:center 47%!important;
+    transform:none!important;filter:saturate(.72) contrast(1.06) brightness(.76)!important;
+  }
+  #cover .cover-stage-copy{
+    position:absolute!important;inset:0!important;z-index:2!important;display:grid!important;
+    grid-template-rows:auto 1fr auto!important;padding:15px 17px 14px!important;
+    background:linear-gradient(180deg,rgba(5,5,6,.12),rgba(5,5,6,.14) 36%,rgba(5,5,6,.68))!important;color:#fff!important;
+  }
+  #cover .cover-stage-top{justify-self:end!important;color:#fff!important;font-size:6px!important;line-height:1.55!important;letter-spacing:.2em!important}
+  #cover .cover-stage-main{align-self:end!important;margin:0 0 2.5svh!important;max-width:82vw!important}
+  #cover .cover-stage-main h2{margin:0!important;color:#fff!important;font-size:clamp(38px,10.8vw,52px)!important;line-height:.98!important;letter-spacing:-.055em!important;text-shadow:0 2px 18px rgba(0,0,0,.6)!important}
+  #cover .cover-stage-main p{margin:11px 0 0!important;color:rgba(255,255,255,.94)!important;font-size:11px!important;line-height:1.55!important;text-shadow:0 2px 12px rgba(0,0,0,.65)!important}
+  #cover .cover-stage-main span{margin-top:12px!important;color:rgba(255,255,255,.82)!important;font-size:6px!important;letter-spacing:.18em!important}
+  #cover .cover-stage-bottom{display:none!important}
+  #cover .cover-copy{
+    grid-row:2!important;position:relative!important;display:block!important;width:100%!important;min-height:58svh!important;
+    overflow:visible!important;padding:16px 17px calc(24px + env(safe-area-inset-bottom))!important;
+    border:0!important;border-top:1px solid #d8d2c7!important;background:#faf9f4!important;color:#151515!important;
+  }
+  #cover .cover-brandrow{display:flex!important;align-items:flex-start!important;justify-content:space-between!important;padding:0 0 13px!important;border-bottom:1px solid #ded8cc!important}
+  #cover .cover-brand b{display:block!important;color:#111!important;font-size:28px!important;line-height:1!important;letter-spacing:-.035em!important}
+  #cover .cover-brand span{display:block!important;margin-top:5px!important;color:#4d4842!important;font-size:7px!important;letter-spacing:.19em!important}
+  #cover .cover-brandwords{color:#77716a!important;font-size:6px!important;line-height:1.55!important;letter-spacing:.14em!important}
+  #cover .cover-editorial-copy{padding:15px 0 13px!important}
+  #cover .cover-small-kicker{display:none!important}
+  #cover .cover-editorial-copy h1{margin:0!important;color:#111!important;font-size:27px!important;line-height:1.18!important;letter-spacing:-.035em!important}
+  #cover .cover-editorial-copy p{margin:10px 0 0!important;color:#4f4a44!important;font-size:10px!important;line-height:1.72!important}
+  #cover .cover-stats{display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr))!important;margin:0!important;border-top:1px solid #d8d2c7!important;border-bottom:1px solid #d8d2c7!important}
+  #cover .cover-stats>div{min-width:0!important;padding:10px 7px!important;border-right:1px solid #d8d2c7!important}
+  #cover .cover-stats>div:first-child{padding-left:0!important}#cover .cover-stats>div:last-child{border-right:0!important}
+  #cover .cover-stats b{display:block!important;color:#111!important;font-size:15px!important;line-height:1.1!important;white-space:normal!important}
+  #cover .cover-stats span{display:block!important;margin-top:4px!important;color:#77716a!important;font-size:6px!important;line-height:1.35!important}
+  #cover .cover-actions{display:grid!important;grid-template-columns:1fr 74px!important;gap:8px!important;margin:13px 0 0!important}
+  #cover .cover-enter,#cover .cover-subaction{position:relative!important;z-index:5!important;width:100%!important;height:48px!important;margin:0!important;padding:0 13px!important;touch-action:manipulation!important;pointer-events:auto!important}
+  #cover .cover-enter{background:#c82831!important;border:1px solid #c82831!important;color:#fff!important;font-size:10px!important}
+  #cover .cover-subaction{background:#faf9f4!important;border:1px solid #aaa399!important;color:#333!important;font-size:8px!important}
+  #cover .cover-creditrow{display:flex!important;align-items:center!important;justify-content:space-between!important;gap:12px!important;padding:12px 0!important;border-bottom:1px solid #ded8cc!important}
+  #cover .cover-creditrow>div:first-child span{color:#77716a!important;font-size:6px!important}#cover .cover-creditrow>div:first-child b{color:#111!important;font-size:9px!important}
+  #cover .cover-social{display:flex!important;gap:8px!important;padding:0!important;border:0!important}#cover .cover-social a{color:#222!important;font-size:8px!important}#cover .cover-social span{color:#aaa399!important}
+  #cover .cover-update-log{padding:11px 0 4px!important;border-bottom:1px solid #ded8cc!important}
+  #cover .cover-update-head{padding-bottom:6px!important}#cover .cover-update-head b{color:#222!important;font-size:7px!important}#cover .cover-update-head span{font-size:6px!important}
+  #cover .cover-update-row{grid-template-columns:66px 32px minmax(0,1fr)!important;gap:5px!important;padding:5px 0!important}
+  #cover .cover-update-row:nth-of-type(n+5){display:none!important}
+  #cover .cover-update-row time,#cover .cover-update-row b,#cover .cover-update-row span{font-size:6.5px!important;color:#5e5851!important}
+  #cover .cover-copyright{display:none!important}
 }
 </style>
 </body></html>
