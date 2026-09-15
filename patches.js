@@ -1959,3 +1959,30 @@ window.M1KOC_RUNTIME_FIX={version:'v238',fix:'shared agencyCanonical for v219+ a
 
 /* v241 checkpoint */
 window.M1KOC_CHECKPOINT={...(window.M1KOC_CHECKPOINT||{}),version:'v241',focus:'unified editorial design across all internal views',checked_at:'2026-09-15'};
+
+
+/* v242 persistent editorial shell */
+(()=>{
+  document.body.classList.add('editorial-ui');
+  const keep=()=>document.body.classList.add('editorial-ui');
+  document.addEventListener('click',()=>requestAnimationFrame(keep),true);
+  window.addEventListener('hashchange',keep);
+  window.M1KOC_CHECKPOINT={...(window.M1KOC_CHECKPOINT||{}),version:'v242',focus:'full readability, size and mobile-width audit across internal pages; update log moved to cover',checked_at:'2026-09-15'};
+})();
+
+
+/* v243 cover live stats + release marker */
+(()=>{
+  if(typeof DB==='undefined')return;
+  const total=document.getElementById('coverCount');
+  const champ=document.getElementById('coverChampCount');
+  if(total)total.textContent=DB.length.toLocaleString('ja-JP')+' 組';
+  if(champ){
+    const winners=new Set();
+    DB.forEach(d=>{
+      [d.m1||{},d.koc||{}].forEach(obj=>Object.values(obj).forEach(v=>{if(/優勝/.test(String(v)))winners.add(d.name)}));
+    });
+    champ.textContent=winners.size.toLocaleString('ja-JP')+' 組';
+  }
+  window.M1KOC_CHECKPOINT={...(window.M1KOC_CHECKPOINT||{}),version:'v243',focus:'final cover design + update log only on cover',checked_at:'2026-09-15'};
+})();
