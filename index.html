@@ -304,7 +304,15 @@ button,select,input{touch-action:manipulation}
     <a href="#priorityTabs" data-priority-nav="forecast"><b>FORECAST</b><span>決勝を予測する</span></a>
     <a href="#about" data-priority-nav="about"><b>ABOUT</b><span>このサイトについて</span></a>
   </nav>
+  <div class="ref-sidebar-bottom">
   <p class="ref-sidebar-copy">お笑いの、<br>これまでと、これからを。<br>データで。</p>
+  <div class="ref-account">
+    <span>CREATED BY</span>
+    <b>RYUTARO INAMI</b>
+    <small>@inaryu_photo</small>
+    <div class="ref-account-links"><a href="https://x.com/inaryu_photo" target="_blank" rel="noopener noreferrer">X</a><a href="https://www.instagram.com/inaryu_photo/" target="_blank" rel="noopener noreferrer">INSTAGRAM</a></div>
+  </div>
+</div>
 </aside>
 <header class="ref-mobile-head" id="refMobileHead">
   <a class="ref-mobile-logo" href="#top" data-priority-home="true"><b>M-1 × KOC</b><span>COMEDY DATABASE</span></a>
@@ -379,6 +387,19 @@ button,select,input{touch-action:manipulation}
     <div class="edpickup-banner"><span>まだ見ぬ、<br>おもしろいを見つけよう。</span></div>
     <div class="edpickups" id="homePickups"></div>
   </article>
+</section>
+<section class="home-updates" id="homeUpdates" aria-labelledby="homeUpdatesTitle">
+  <div class="home-updates-head"><div><span>UPDATE LOG</span><h2 id="homeUpdatesTitle">更新履歴</h2></div><p>サイトとデータの主な更新のみ記録しています。</p></div>
+  <div class="home-update-list">
+    <article><time>2026.09.15</time><b>v238</b><p>分析スクリプトのスコープ不具合を修正。TOTAL POWER・グラフ・各集計の描画を復旧。</p></article>
+    <article><time>2026.09.15</time><b>v237</b><p>制作者アカウント導線とUPDATE LOGをトップへ追加。</p></article>
+    <article><time>2026.09.15</time><b>v236</b><p>スマホ表示を修復。TOTAL POWER / NEXT STAR / AGENCY / FORECAST を独立タブ化。</p></article>
+    <article><time>2026.09.15</time><b>v235</b><p>TOTAL POWERを可視化。TOP10、POWER COMPOSITION、LANDSCAPE、TIERSを追加。</p></article>
+    <article><time>2026.09.15</time><b>v234</b><p>表示優先順位を TOTAL POWER → NEXT STAR → AGENCY → FORECAST に再編。</p></article>
+    <article><time>2026.09.15</time><b>v233</b><p>新デザインへDB集計、グラフ、ランキング、FORECAST/BACKTESTを再接続。</p></article>
+    <article><time>2026.09.15</time><b>v232</b><p>トップページをEDITORIAL ARCHIVEデザインへ全面刷新。</p></article>
+  </div>
+  <div class="home-updates-foot"><span>DATA / DESIGN DEVELOPMENT LOG</span><a href="https://github.com/inaryu070/m1-koc-database" target="_blank" rel="noopener noreferrer">GITHUB ↗</a></div>
 </section>
 
 <section class="totalpowerpage" id="totalPowerPage" aria-label="総合ポイントランキング">
@@ -709,7 +730,7 @@ button,select,input{touch-action:manipulation}
   </div>
   <div class="footer-meta">
     <span>収録基準・配点・外部賞レースの詳細は上の ABOUT THIS DATABASE から確認できます。</span>
-    <span>DATA v214 · LAST UPDATE 2026-09-14</span>
+    <span>DATA v238 · LAST UPDATE 2026-09-15</span>
   </div>
 </div>
 </main></div>
@@ -1095,5 +1116,13 @@ body.home-index.priority-total.total-detail-open .sectionlabel{display:flex!impo
 body.home-index.priority-total.total-detail-open .stats{display:grid!important}
 body.home-index.priority-total.total-detail-open #grid{display:grid!important}
 body.home-index.priority-total.total-detail-open #comparebar.show{display:flex!important}
+</style>
+
+<style>
+/* v237 home creator links + update log */
+.ref-sidebar-bottom{margin-top:auto;padding:0 22px 24px}.ref-sidebar-bottom .ref-sidebar-copy{margin:0 0 18px}.ref-account{padding-top:14px;border-top:1px solid #ddd8cd;color:#111}.ref-account>span{display:block;font-size:7px;letter-spacing:.18em;color:#8a867f}.ref-account>b{display:block;margin-top:5px;font-family:Georgia,'Yu Mincho','Hiragino Mincho ProN',serif;font-size:11px;font-weight:500;letter-spacing:.04em}.ref-account>small{display:block;margin-top:3px;color:#77736c;font-size:8px}.ref-account-links{display:flex;gap:12px;margin-top:10px}.ref-account-links a{color:#222;text-decoration:none;font-size:8px;letter-spacing:.12em;border-bottom:1px solid #99958d;padding-bottom:2px}.ref-account-links a:hover{color:#d94a45;border-color:#d94a45}.ref-mobile-account{display:flex;align-items:center;gap:14px;padding:13px 0 2px;color:#77736c;font-size:9px}.ref-mobile-account span{margin-right:auto}.ref-mobile-account a{color:#222;text-decoration:none;font-size:9px;letter-spacing:.08em}
+.home-updates{margin:24px 0 32px;padding:22px 0 0;border-top:1px solid var(--rule);border-bottom:1px solid var(--rule);color:#111}.home-updates-head{display:flex;justify-content:space-between;gap:24px;align-items:flex-end;padding-bottom:12px}.home-updates-head span{display:block;font-size:8px;letter-spacing:.18em;color:#77736c}.home-updates-head h2{margin:5px 0 0;font-family:'Yu Mincho','Hiragino Mincho ProN',serif;font-size:28px;font-weight:600;letter-spacing:.02em}.home-updates-head p{margin:0 0 3px;color:#77736c;font-size:9px}.home-update-list{border-top:1px solid var(--rule)}.home-update-list article{display:grid;grid-template-columns:94px 58px minmax(0,1fr);gap:12px;align-items:baseline;padding:10px 0;border-bottom:1px solid #e0dbd0}.home-update-list time,.home-update-list b{font-size:8px;letter-spacing:.1em;font-weight:500}.home-update-list time{color:#77736c}.home-update-list b{color:#d94a45}.home-update-list p{margin:0;color:#333;font-family:'Yu Mincho','Hiragino Mincho ProN',serif;font-size:10px;line-height:1.65}.home-updates-foot{display:flex;justify-content:space-between;align-items:center;padding:10px 0 12px;color:#8b877f;font-size:7px;letter-spacing:.14em}.home-updates-foot a{color:#222;text-decoration:none;border-bottom:1px solid #99958d;padding-bottom:2px}
+@media(max-width:760px){.home-updates{margin:18px 0 24px}.home-updates-head{align-items:flex-start}.home-updates-head h2{font-size:23px}.home-updates-head p{max-width:160px;text-align:right;font-size:8px}.home-update-list article{grid-template-columns:76px 42px minmax(0,1fr);gap:8px;padding:9px 0}.home-update-list p{font-size:9px}.ref-sidebar-bottom{display:none}}
+@media(max-width:480px){.home-updates-head p{display:none}.home-update-list article{grid-template-columns:70px 38px minmax(0,1fr)}.home-update-list article:nth-child(n+4){display:none}.home-updates-foot{font-size:6px}}
 </style>
 </body></html>

@@ -1016,6 +1016,11 @@ window.M1KOC_CHECKPOINT={...(window.M1KOC_CHECKPOINT||{}),version:'v218',focus:'
 })();
 
 
+/* shared agency normalizer for v219+ analytics (v238 runtime fix) */
+const agencyCanonical=d=>{let k=d.agency_key||d.agency||'';if(k==='mixed')return'複数所属';if(k==='サンミュージック')return'サンミュージックプロダクション';if(k==='SMA NEET PROJECT')return'SMA';return k};
+
+window.M1KOC_RUNTIME_FIX={version:'v238',fix:'shared agencyCanonical for v219+ analytics',checked_at:'2026-09-15'};
+
 /* v219 tournament-by-tournament agency balance */
 (()=>{
   const root=document.getElementById('agencyTournament');
