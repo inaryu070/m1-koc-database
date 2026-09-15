@@ -1880,13 +1880,23 @@ window.M1KOC_RUNTIME_FIX={version:'v238',fix:'shared agencyCanonical for v219+ a
   function render(){const data=rows();renderTop(data);renderComposition(data);renderTiers(data);renderTable(data);drawLandscape(data);wireNames();document.querySelectorAll('[data-tp-period]').forEach(b=>b.classList.toggle('on',b.dataset.tpPeriod===state.period));document.querySelectorAll('[data-tp-scope]').forEach(b=>b.classList.toggle('on',b.dataset.tpScope===state.scope));}
   document.getElementById('tpPeriod')?.addEventListener('click',e=>{const b=e.target.closest('[data-tp-period]');if(!b)return;state.period=b.dataset.tpPeriod;state.limit=40;render()});
   document.getElementById('tpScope')?.addEventListener('click',e=>{const b=e.target.closest('[data-tp-scope]');if(!b)return;state.scope=b.dataset.tpScope;state.limit=40;render()});
-  document.getElementById('tpSearch')?.addEventListener('input',e=>{state.query=e.target.value;state.limit=40;renderTable(rows());wireNames()});
+  const tpSearch=document.getElementById('tpSearch');
+  const tpQuickSearch=document.getElementById('tpQuickSearch');
+  const applyTpSearch=(value,source)=>{
+    state.query=value;state.limit=40;
+    if(tpSearch&&source!==tpSearch)tpSearch.value=value;
+    if(tpQuickSearch&&source!==tpQuickSearch)tpQuickSearch.value=value;
+    renderTable(rows());wireNames();
+  };
+  tpSearch?.addEventListener('input',e=>applyTpSearch(e.target.value,e.target));
+  tpQuickSearch?.addEventListener('input',e=>applyTpSearch(e.target.value,e.target));
+  tpQuickSearch?.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();document.querySelector('.tp-ranking')?.scrollIntoView({behavior:'smooth',block:'start'})}});
   document.getElementById('tpMore')?.addEventListener('click',()=>{state.limit+=50;renderTable(rows());wireNames()});
   document.getElementById('tpDetailToggle')?.addEventListener('click',e=>{const on=document.body.classList.toggle('total-detail-open');e.currentTarget.setAttribute('aria-expanded',on?'true':'false');e.currentTarget.textContent=on?'DETAIL FILTER ↑':'DETAIL FILTER ↘';if(on)requestAnimationFrame(()=>document.getElementById('search')?.scrollIntoView({behavior:'smooth',block:'start'}))});
   document.addEventListener('click',e=>{const t=e.target.closest('[data-priority-target],[data-priority-nav]');if(t&&((t.dataset.priorityTarget||t.dataset.priorityNav)==='total'))requestAnimationFrame(()=>requestAnimationFrame(render))},true);
   let rt;addEventListener('resize',()=>{if(!document.body.classList.contains('priority-total'))return;clearTimeout(rt);rt=setTimeout(()=>drawLandscape(rows()),120)});
   bindCanvas();render();
-  window.M1KOC_TOTAL_POWER={render,version:'v235',state};
+  window.M1KOC_TOTAL_POWER={render,version:'v253',state};
   window.M1KOC_CHECKPOINT={...(window.M1KOC_CHECKPOINT||{}),version:'v235',focus:'TOTAL POWER editorial ranking + composition + landscape',checked_at:'2026-09-15'};
 })();
 

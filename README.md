@@ -1,11 +1,11 @@
-## v252
+## v253
 - 扉の操作を ENTER DATABASE の1ボタンに統一
 - ページ内ナビゲーションの参照先を修正
 - 扉表示中の db.js / core.js preload を廃止して初期負荷を軽減
 - light UI metadata・dialog accessibility・M-1予測注記を監査修正
 - メインコピー「面白いを、可視化する。」と承認済み説明文は変更なし
 
-# M-1 × KOC 戦績データベース — GitHub Pages v252
+# M-1 × KOC 戦績データベース — GitHub Pages v253
 
 **面白いを、可視化する。**  
 M-1グランプリとキングオブコントの主要戦績を横断検索・分析する非公式データベースです。
