@@ -1,0 +1,10 @@
+v244 audit — 2026-09-15
+- JS syntax: core.js OK / patches.js OK
+- HTML duplicate ids: 0
+- Photo hero text: explicit white !important override after editorial global rules
+- Mobile photo hero: stronger dark overlay + white text override
+- Cover state: MutationObserver + pageshow/visibility/popstate synchronization
+- ENTER/SKIP: capture-phase deterministic close; stale cover-open removed
+- Logo/home action: deterministic cover reopen
+- Update log: cover only (1); internal update log (0)
+- Required assets/scripts present: yes

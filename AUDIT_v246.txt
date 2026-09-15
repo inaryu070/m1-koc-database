@@ -1,0 +1,13 @@
+v246 audit — 2026-09-15
+- Removed v240 cover controller: PASS
+- Removed v244 MutationObserver cover controller: PASS
+- Removed v245 pointer/touch/click multi-handler cover controller: PASS
+- Canonical cover controller: core.js only
+- ENTER DATABASE click listener: 1
+- SKIP click listener: 1
+- Cover state: display grid / display none, no transition dependency
+- Mobile viewport: svh, no image transform
+- core.js syntax: PASS
+- patches.js syntax: PASS
+- duplicate HTML ids: 0
+- required files: PASS

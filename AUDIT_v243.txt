@@ -1,0 +1,14 @@
+M-1 x KOC DATABASE v243 — CHECK REPORT
+Date: 2026-09-15
+
+[PASS] core.js syntax
+[PASS] patches.js syntax
+[PASS] HTML parses successfully
+[PASS] required DOM ids present
+[PASS] duplicate HTML ids: 0
+[PASS] required assets present: db.js / core.js / patches.js / hero-mic.jpg
+[PASS] UPDATE LOG markup exists only on the cover
+[PASS] cover live stats IDs wired: total units / champions
+[PASS] cover ENTER and SKIP controls retained
+
+Scope: cover implementation based on approved mockup; internal pages unchanged from v242.

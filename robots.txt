@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://inaryu070.github.io/m1-koc-database/sitemap.xml

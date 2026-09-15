@@ -1,0 +1,20 @@
+{
+  "version": "v242",
+  "duplicate_ids": [],
+  "missing_assets": [],
+  "missing_required_ids": [],
+  "cover_update_log_count": 1,
+  "internal_update_log_count": 0,
+  "guards": {
+    "editorial_body_class": true,
+    "viewport_ok": true,
+    "mobile_one_column_grid": true,
+    "global_overflow_guard": true,
+    "drawer_paper_theme": true,
+    "agency_value_dark": true,
+    "discovery_paper_theme": true,
+    "forecast_text_dark": true
+  },
+  "legacy_dark_light_selectors_uncovered": [],
+  "chromium_render_check": "not available in this container (Chromium hangs even on a trivial local HTML; static/structural checks used instead)"
+}

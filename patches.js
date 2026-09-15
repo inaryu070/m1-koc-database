@@ -1786,9 +1786,8 @@ window.M1KOC_RUNTIME_FIX={version:'v238',fix:'shared agencyCanonical for v219+ a
     const home=e.target.closest('[data-priority-home]');
     if(home){
       e.preventDefault();
-      const cover=document.getElementById('cover');
-      if(cover){cover.classList.remove('is-hidden');cover.setAttribute('aria-hidden','false');document.body.classList.add('cover-open');}
-      window.scrollTo({top:0,behavior:'auto'});
+      if(window.M1KOC_COVER?.open)window.M1KOC_COVER.open();
+      else window.scrollTo({top:0,behavior:'auto'});
       return
     }
     const t=e.target.closest('[data-priority-target]');
@@ -1933,30 +1932,6 @@ window.M1KOC_RUNTIME_FIX={version:'v238',fix:'shared agencyCanonical for v219+ a
 })();
 
 
-/* v240 cover as true editorial landing page */
-(()=>{
-  const body=document.body;
-  const cover=document.getElementById('cover');
-  const enter=document.getElementById('coverEnter');
-  const skip=document.getElementById('coverSkip');
-  const open=()=>{if(!cover)return;cover.classList.remove('is-hidden');cover.setAttribute('aria-hidden','false');body.classList.add('cover-open');window.scrollTo({top:0,behavior:'auto'});};
-  const close=()=>{if(!cover)return;cover.classList.add('is-hidden');cover.setAttribute('aria-hidden','true');body.classList.remove('cover-open');};
-  if(cover){open();}
-  document.addEventListener('keydown',e=>{
-    if(body.classList.contains('cover-open')&&(e.key==='Enter'||e.key==='Escape')){
-      if(e.target!==enter&&e.target!==skip){e.stopImmediatePropagation();}
-    }
-  },true);
-  document.addEventListener('click',e=>{
-    const home=e.target.closest('[data-priority-home]');
-    if(home){e.preventDefault();e.stopImmediatePropagation();open();}
-  },true);
-  [enter,skip].forEach(btn=>btn&&btn.addEventListener('click',()=>setTimeout(close,0),true));
-  window.M1KOC_COVER={open,close,version:'v240'};
-  window.M1KOC_CHECKPOINT={...(window.M1KOC_CHECKPOINT||{}),version:'v240',focus:'cover redesign aligned to editorial interior + explicit landing behavior',checked_at:'2026-09-15'};
-})();
-
-
 /* v241 checkpoint */
 window.M1KOC_CHECKPOINT={...(window.M1KOC_CHECKPOINT||{}),version:'v241',focus:'unified editorial design across all internal views',checked_at:'2026-09-15'};
 
@@ -1988,108 +1963,6 @@ window.M1KOC_CHECKPOINT={...(window.M1KOC_CHECKPOINT||{}),version:'v241',focus:'
 })();
 
 
-/* v244 — enforce cover/body state invariants and prevent blank black screen */
-(()=>{
-  const body=document.body;
-  const cover=document.getElementById('cover');
-  if(!body||!cover)return;
-  const enter=document.getElementById('coverEnter');
-  const skip=document.getElementById('coverSkip');
-  let syncing=false;
-  const hidden=()=>cover.classList.contains('is-hidden')||cover.getAttribute('aria-hidden')==='true';
-  const sync=()=>{
-    if(syncing)return;
-    syncing=true;
-    if(hidden()){
-      body.classList.remove('cover-open');
-      cover.setAttribute('aria-hidden','true');
-    }else{
-      body.classList.add('cover-open');
-      cover.setAttribute('aria-hidden','false');
-    }
-    syncing=false;
-  };
-  const closeNow=()=>{
-    cover.classList.add('is-hidden');
-    cover.setAttribute('aria-hidden','true');
-    body.classList.remove('cover-open');
-  };
-  const openNow=()=>{
-    cover.classList.remove('is-hidden');
-    cover.setAttribute('aria-hidden','false');
-    body.classList.add('cover-open');
-    window.scrollTo({top:0,behavior:'auto'});
-  };
-  // Capture these controls before older listeners so their final state is deterministic.
-  [enter,skip].forEach(btn=>btn&&btn.addEventListener('click',e=>{
-    e.preventDefault();
-    e.stopImmediatePropagation();
-    closeNow();
-  },true));
-  document.addEventListener('click',e=>{
-    const home=e.target.closest('[data-priority-home]');
-    if(home){
-      e.preventDefault();
-      e.stopImmediatePropagation();
-      openNow();
-    }
-  },true);
-  const observer=new MutationObserver(sync);
-  observer.observe(cover,{attributes:true,attributeFilter:['class','aria-hidden']});
-  window.addEventListener('pageshow',sync);
-  window.addEventListener('popstate',()=>requestAnimationFrame(sync));
-  document.addEventListener('visibilitychange',()=>{if(!document.hidden)sync()});
-  requestAnimationFrame(sync);
-  window.M1KOC_COVER_STATE={open:openNow,close:closeNow,sync,version:'v244'};
-  window.M1KOC_CHECKPOINT={...(window.M1KOC_CHECKPOINT||{}),version:'v244',focus:'photo hero contrast + black-screen cover invariant',checked_at:'2026-09-15'};
-})();
 
-/* v245 — mobile cover entry hardening */
-(()=>{
-  const body=document.body;
-  const cover=document.getElementById('cover');
-  const enter=document.getElementById('coverEnter');
-  const skip=document.getElementById('coverSkip');
-  if(!body||!cover)return;
-  let leaving=false;
-  const leaveCover=(e)=>{
-    if(e){ e.preventDefault(); e.stopPropagation(); }
-    if(leaving)return;
-    leaving=true;
-    // Remove the gate synchronously. Do not depend on transition or older listeners.
-    cover.classList.add('is-hidden');
-    cover.setAttribute('aria-hidden','true');
-    cover.style.pointerEvents='none';
-    body.classList.remove('cover-open');
-    body.style.overflow='';
-    // Force the internal shell visible on iOS Safari as well.
-    document.querySelectorAll('.wrap,.ref-mobile-head,.ref-sidebar').forEach(el=>{
-      el.style.visibility='visible';
-      el.style.pointerEvents='auto';
-    });
-    // TOTAL POWER is the canonical first internal page.
-    try{ window.setPriorityView?.('total'); }catch(_e){}
-    window.scrollTo(0,0);
-    requestAnimationFrame(()=>{
-      body.classList.remove('cover-open');
-      cover.classList.add('is-hidden');
-      leaving=false;
-    });
-  };
-  const bind=(btn)=>{
-    if(!btn)return;
-    btn.style.touchAction='manipulation';
-    btn.addEventListener('pointerup',leaveCover,{capture:true});
-    btn.addEventListener('touchend',leaveCover,{capture:true,passive:false});
-    btn.addEventListener('click',leaveCover,{capture:true});
-  };
-  bind(enter); bind(skip);
-  // Emergency invariant: a hidden cover must never keep the body gated.
-  const repair=()=>{
-    const isHidden=cover.classList.contains('is-hidden')||cover.getAttribute('aria-hidden')==='true';
-    if(isHidden) body.classList.remove('cover-open');
-  };
-  window.addEventListener('pageshow',repair);
-  document.addEventListener('visibilitychange',()=>{if(!document.hidden)repair()});
-  window.M1KOC_CHECKPOINT={...(window.M1KOC_CHECKPOINT||{}),version:'v245',focus:'iOS/mobile cover entry hardening',checked_at:'2026-09-15'};
-})();
+/* v246 — legacy cover controllers removed; core.js is sole cover controller */
+window.M1KOC_CHECKPOINT={...(window.M1KOC_CHECKPOINT||{}),version:'v246',focus:'single cover controller + mobile performance reset',checked_at:'2026-09-15'};
