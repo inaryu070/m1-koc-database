@@ -2043,3 +2043,53 @@ window.M1KOC_CHECKPOINT={...(window.M1KOC_CHECKPOINT||{}),version:'v241',focus:'
   window.M1KOC_COVER_STATE={open:openNow,close:closeNow,sync,version:'v244'};
   window.M1KOC_CHECKPOINT={...(window.M1KOC_CHECKPOINT||{}),version:'v244',focus:'photo hero contrast + black-screen cover invariant',checked_at:'2026-09-15'};
 })();
+
+/* v245 — mobile cover entry hardening */
+(()=>{
+  const body=document.body;
+  const cover=document.getElementById('cover');
+  const enter=document.getElementById('coverEnter');
+  const skip=document.getElementById('coverSkip');
+  if(!body||!cover)return;
+  let leaving=false;
+  const leaveCover=(e)=>{
+    if(e){ e.preventDefault(); e.stopPropagation(); }
+    if(leaving)return;
+    leaving=true;
+    // Remove the gate synchronously. Do not depend on transition or older listeners.
+    cover.classList.add('is-hidden');
+    cover.setAttribute('aria-hidden','true');
+    cover.style.pointerEvents='none';
+    body.classList.remove('cover-open');
+    body.style.overflow='';
+    // Force the internal shell visible on iOS Safari as well.
+    document.querySelectorAll('.wrap,.ref-mobile-head,.ref-sidebar').forEach(el=>{
+      el.style.visibility='visible';
+      el.style.pointerEvents='auto';
+    });
+    // TOTAL POWER is the canonical first internal page.
+    try{ window.setPriorityView?.('total'); }catch(_e){}
+    window.scrollTo(0,0);
+    requestAnimationFrame(()=>{
+      body.classList.remove('cover-open');
+      cover.classList.add('is-hidden');
+      leaving=false;
+    });
+  };
+  const bind=(btn)=>{
+    if(!btn)return;
+    btn.style.touchAction='manipulation';
+    btn.addEventListener('pointerup',leaveCover,{capture:true});
+    btn.addEventListener('touchend',leaveCover,{capture:true,passive:false});
+    btn.addEventListener('click',leaveCover,{capture:true});
+  };
+  bind(enter); bind(skip);
+  // Emergency invariant: a hidden cover must never keep the body gated.
+  const repair=()=>{
+    const isHidden=cover.classList.contains('is-hidden')||cover.getAttribute('aria-hidden')==='true';
+    if(isHidden) body.classList.remove('cover-open');
+  };
+  window.addEventListener('pageshow',repair);
+  document.addEventListener('visibilitychange',()=>{if(!document.hidden)repair()});
+  window.M1KOC_CHECKPOINT={...(window.M1KOC_CHECKPOINT||{}),version:'v245',focus:'iOS/mobile cover entry hardening',checked_at:'2026-09-15'};
+})();
