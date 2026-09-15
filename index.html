@@ -285,7 +285,7 @@ button,select,input{touch-action:manipulation}
 .footer-publiclinks{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}.footer-publiclinks a{min-height:30px;padding:0 10px;display:inline-flex;align-items:center;border:1px solid #33353a;border-radius:999px;color:#aeb2ba;font-size:9px;text-decoration:none}.footer-publiclinks a:hover{border-color:#686b72;color:#fff}
 </style>
 </head>
-<body class="cover-open home-index"><a class="skiplink" href="#search">検索・絞り込みへ移動</a><noscript><div class="noscript-note">このデータベースの検索・ランキング・グラフ表示にはJavaScriptが必要です。ブラウザでJavaScriptを有効にしてご覧ください。</div></noscript>
+<body class="cover-open home-index priority-total"><a class="skiplink" href="#search">検索・絞り込みへ移動</a><noscript><div class="noscript-note">このデータベースの検索・ランキング・グラフ表示にはJavaScriptが必要です。ブラウザでJavaScriptを有効にしてご覧ください。</div></noscript>
 <section class="cover" id="cover" aria-label="M-1 × KOC 戦績データベース入口">
   <div class="cover-copy">
     <div class="cover-kicker">COMEDY COMPETITION ARCHIVE</div>
@@ -296,29 +296,27 @@ button,select,input{touch-action:manipulation}
   <button class="cover-skip" id="coverSkip" type="button">SKIP</button>
 </section>
 <aside class="ref-sidebar" id="refSidebar" aria-label="メインナビゲーション">
-  <a class="ref-logo" href="#top" data-ref-nav="home"><b>M-1 × KOC</b><span>COMEDY DATABASE</span></a>
+  <a class="ref-logo" href="#top" data-priority-home="true"><b>M-1 × KOC</b><span>COMEDY DATABASE</span></a>
   <nav class="ref-nav">
-    <a class="active" href="#top" data-ref-nav="home"><b>HOME</b><span>ホーム</span></a>
-    <a href="#discoveryRoot" data-ref-nav="discovery"><b>DISCOVERY</b><span>コンビ・芸人を探す</span></a>
-    <a href="#agencyVisuals" data-ref-nav="visuals"><b>VISUALS</b><span>データで見る</span></a>
-    <a href="#discoveryRoot" data-ref-nav="forecast"><b>FORECAST</b><span>予測する</span></a>
-    <a href="#search" data-ref-nav="teams"><b>TEAMS</b><span>事務所で見る</span></a>
-    <a href="#about" data-ref-nav="about"><b>ABOUT</b><span>このサイトについて</span></a>
+    <a class="active" href="#priorityTabs" data-priority-nav="total"><b>TOTAL POWER</b><span>総合ポイント</span></a>
+    <a href="#priorityTabs" data-priority-nav="nextstar"><b>NEXT STAR</b><span>次に来るコンビ</span></a>
+    <a href="#priorityTabs" data-priority-nav="agency"><b>AGENCY</b><span>事務所で見る</span></a>
+    <a href="#priorityTabs" data-priority-nav="forecast"><b>FORECAST</b><span>決勝を予測する</span></a>
+    <a href="#about" data-priority-nav="about"><b>ABOUT</b><span>このサイトについて</span></a>
   </nav>
   <p class="ref-sidebar-copy">お笑いの、<br>これまでと、これからを。<br>データで。</p>
 </aside>
 <header class="ref-mobile-head" id="refMobileHead">
-  <a class="ref-mobile-logo" href="#top" data-ref-nav="home"><b>M-1 × KOC</b><span>COMEDY DATABASE</span></a>
+  <a class="ref-mobile-logo" href="#top" data-priority-home="true"><b>M-1 × KOC</b><span>COMEDY DATABASE</span></a>
   <button class="ref-menu-button" id="refMenuButton" type="button" aria-expanded="false" aria-controls="refMobileMenu"><i></i><i></i><i></i><span>MENU</span></button>
 </header>
 <div class="ref-mobile-menu" id="refMobileMenu" hidden>
   <nav>
-    <a href="#top" data-ref-nav="home">HOME <span>ホーム</span></a>
-    <a href="#discoveryRoot" data-ref-nav="discovery">DISCOVERY <span>コンビ・芸人を探す</span></a>
-    <a href="#agencyVisuals" data-ref-nav="visuals">VISUALS <span>データで見る</span></a>
-    <a href="#discoveryRoot" data-ref-nav="forecast">FORECAST <span>予測する</span></a>
-    <a href="#search" data-ref-nav="teams">TEAMS <span>事務所で見る</span></a>
-    <a href="#about" data-ref-nav="about">ABOUT <span>このサイトについて</span></a>
+    <a href="#priorityTabs" data-priority-nav="total">TOTAL POWER <span>総合ポイント</span></a>
+    <a href="#priorityTabs" data-priority-nav="nextstar">NEXT STAR <span>次に来るコンビ</span></a>
+    <a href="#priorityTabs" data-priority-nav="agency">AGENCY <span>事務所で見る</span></a>
+    <a href="#priorityTabs" data-priority-nav="forecast">FORECAST <span>決勝を予測する</span></a>
+    <a href="#about" data-priority-nav="about">ABOUT <span>このサイトについて</span></a>
   </nav>
 </div>
 <div class="wrap">
@@ -352,12 +350,14 @@ button,select,input{touch-action:manipulation}
 </section>
 <section class="edlower" id="edLower">
   <article class="edpanel edforecast">
-    <div class="edminihead"><b>2026 決勝予想</b><span>M-1 / BALANCED</span></div>
+    <div class="edminihead"><b>2026 決勝予想</b><span id="homeForecastModeLabel">M-1 / BALANCED</span></div>
+    <div class="edcontesttabs" id="homeForecastTabs" role="tablist" aria-label="決勝予想の大会"><button type="button" class="on" data-home-forecast-contest="m1">M-1</button><button type="button" data-home-forecast-contest="koc">KOC</button></div>
     <ol class="edforecastlist" id="homeForecastList"></ol>
     <a class="edlink mini" href="#discoveryRoot" data-go="discovery">FORECASTの詳細へ</a>
   </article>
   <article class="edpanel edbacktest">
     <div class="edminihead"><b>予測を検証する</b><span>直近3年の答え合わせ</span></div>
+    <div class="edcontesttabs" id="homeBacktestTabs" role="tablist" aria-label="バックテストの大会"><button type="button" class="on" data-home-backtest-contest="m1">M-1</button><button type="button" data-home-backtest-contest="koc">KOC</button></div>
     <div class="edbacktestsummary" id="homeBacktestSummary"></div>
     <div id="homeBacktestTable"></div>
   </article>
@@ -368,14 +368,51 @@ button,select,input{touch-action:manipulation}
   </article>
 </section>
 
-<div class="primarytabs" id="primaryTabs" role="tablist" aria-label="主要コンテンツ">
-  <button class="primarytab on" id="primaryTabDatabase" type="button" role="tab" aria-selected="true" data-primary-target="database"><span><strong>DATABASE</strong><span>コンビ検索・ランキング・NEXT STAR</span></span><i>↘</i></button>
-  <button class="primarytab" id="primaryTabAgency" type="button" role="tab" aria-selected="false" data-primary-target="agency"><span><strong>AGENCY ANALYSIS</strong><span>事務所POWER・勢力変遷・M-1 / KOC DNA</span></span><i>↘</i></button>
-  <button class="primarytab" id="primaryTabDiscovery" type="button" role="tab" aria-selected="false" data-primary-target="discovery"><span><strong>DISCOVERY</strong><span>世代・勢い・決勝までの軌跡・二刀流</span></span><i>↘</i></button>
+<div class="primarytabs prioritytabs" id="primaryTabs" role="tablist" aria-label="優先表示コンテンツ">
+  <button class="primarytab prioritytab on" id="priorityTabTotal" type="button" role="tab" aria-selected="true" data-priority-target="total"><span><strong>TOTAL POWER</strong><span>総合ポイント</span></span><i>01</i></button>
+  <button class="primarytab prioritytab" id="priorityTabNextstar" type="button" role="tab" aria-selected="false" data-priority-target="nextstar"><span><strong>NEXT STAR</strong><span>次に来るコンビ</span></span><i>02</i></button>
+  <button class="primarytab prioritytab" id="priorityTabAgency" type="button" role="tab" aria-selected="false" data-priority-target="agency"><span><strong>AGENCY</strong><span>事務所関連</span></span><i>03</i></button>
+  <button class="primarytab prioritytab" id="priorityTabForecast" type="button" role="tab" aria-selected="false" data-priority-target="forecast"><span><strong>FORECAST</strong><span>決勝予測</span></span><i>04</i></button>
 </div>
-<p class="primary-view-note database-note">DATABASE VIEW — コンビ検索、ランキング、NEXT STARを表示中。</p>
-<p class="primary-view-note agency-note">AGENCY VIEW — 事務所POWERと勢力変遷だけを表示。上のタブでいつでもDATABASEへ戻れます。</p>
-<p class="primary-view-note discovery-note">DISCOVERY — 戦績の“構造”を読むビュー。タブ説明は1行、詳しい定義は「？」にまとめています。</p>
+<section class="priorityintro" id="priorityIntro" aria-live="polite">
+  <span id="priorityKicker">RANKING / ALL RECORDS</span>
+  <h2 id="priorityTitle">総合ポイント</h2>
+  <p id="priorityDescription">M-1・KOC本体点と収録済み外部賞レース加点を合算した、全ユニットの総合ランキング。</p>
+</section>
+
+<section class="totalpowerpage" id="totalPowerPage" aria-label="総合ポイントランキング">
+  <div class="tp-controls" aria-label="TOTAL POWER 表示条件">
+    <div class="tp-controlgroup"><span>PERIOD</span><div class="tp-segments" id="tpPeriod"><button class="on" type="button" data-tp-period="all">ALL</button><button type="button" data-tp-period="recent3">3Y</button><button type="button" data-tp-period="2025">2025</button></div></div>
+    <div class="tp-controlgroup"><span>SCOPE</span><div class="tp-segments" id="tpScope"><button class="on" type="button" data-tp-scope="total">TOTAL</button><button type="button" data-tp-scope="m1">M-1</button><button type="button" data-tp-scope="koc">KOC</button></div></div>
+    <button class="tp-detail-toggle" id="tpDetailToggle" type="button" aria-expanded="false">DETAIL FILTER ↘</button>
+  </div>
+
+  <section class="tp-top10" aria-labelledby="tpTopTitle">
+    <div class="tp-sectionhead"><div><span>01 / TOP 10</span><h3 id="tpTopTitle">Power Ranking</h3></div><p id="tpTopCaption">M-1 / KOC / OTHER AWARDS の構成まで表示</p></div>
+    <div class="tp-toplist" id="tpTopList"></div>
+  </section>
+
+  <section class="tp-composition" aria-labelledby="tpCompTitle">
+    <div class="tp-sectionhead compact"><div><span>02 / COMPOSITION</span><h3 id="tpCompTitle">Power Composition</h3></div><p>M-1 / KOC / BONUS</p></div>
+    <div class="tp-comp-list" id="tpCompList"></div>
+  </section>
+
+  <section class="tp-landscape" aria-labelledby="tpLandscapeTitle">
+    <div class="tp-sectionhead compact"><div><span>03 / LANDSCAPE</span><h3 id="tpLandscapeTitle">Power Landscape</h3></div><p>X = M-1 / Y = KOC / SIZE = BONUS</p></div>
+    <div class="tp-canvaswrap"><canvas id="tpLandscapeCanvas" aria-label="M-1ポイントとKOCポイントの散布図"></canvas><div class="tp-tip" id="tpLandscapeTip"></div></div>
+  </section>
+
+  <section class="tp-tiers" aria-labelledby="tpTierTitle">
+    <div class="tp-sectionhead compact"><div><span>04 / DISTRIBUTION</span><h3 id="tpTierTitle">Power Tiers</h3></div><p>ランキング全体のポイント分布</p></div>
+    <div class="tp-tiergrid" id="tpTierGrid"></div>
+  </section>
+
+  <section class="tp-ranking" aria-labelledby="tpRankingTitle">
+    <div class="tp-sectionhead"><div><span>05 / INDEX</span><h3 id="tpRankingTitle">All Ranking</h3></div><div class="tp-rankingtools"><input id="tpSearch" type="search" placeholder="コンビ名を検索" aria-label="総合ランキングをコンビ名で検索"><span id="tpRankCount"></span></div></div>
+    <div class="tp-tablewrap" id="tpTableWrap"></div>
+    <button class="tp-more" id="tpMore" type="button">MORE ↓</button>
+  </section>
+</section>
 
 <div class="coverage"><span class="cov m1">M-1 2001–2010 準決勝以上</span><span class="cov m1">M-1 2015–2025 3回戦以上</span><span class="cov m1">2020年は準々決勝以上</span><span class="cov seed">M-1 2026 シード資格</span><span class="cov koc">KOC 2008–2016 準決勝以上</span><span class="cov koc">KOC 2017–2025 準々決勝以上</span><span class="cov koc">KOC 2026 準決勝以上（9/10更新）</span></div>
 <div class="scoring"><b>SCORING</b><span>3回戦 <i>1</i></span><span>準々決勝 <i>2</i></span><span>準決勝 <i>3</i></span><span>決勝 <i>5</i></span><span>優勝 <i>15 pt</i></span><span>ラウンド限定・未経験者解析に対応</span></div>
@@ -393,7 +430,7 @@ button,select,input{touch-action:manipulation}
 <button type="button" class="pill" data-f="m1final">M-1決勝</button><button type="button" class="pill" data-f="m1sf">M-1準決勝以上</button><button type="button" class="pill" data-f="m13r">M-1 3回戦以上</button><button type="button" class="pill" data-f="m1many">M-1戦績 5回+</button>
 <button type="button" class="pill" data-f="kocfinal">KOC決勝</button><button type="button" class="pill" data-f="kocmany">KOC SF以上 5回+</button><button type="button" class="pill" data-f="koc2026">KOC 2026 SF+</button><button type="button" class="pill" data-f="both">M-1×KOC</button>
 </div>
-<div class="utilitybar"><label class="sortlabel">SORT <select id="sort" class="sort"><option value="recent">最近の戦績順</option><option value="extended">拡張総合ポイント</option><option value="score" selected>M-1／KOC本体ポイント</option><option value="dual">二刀流指数</option><option value="average">1大会平均ポイント</option><option value="streak">最長連続収録</option><option value="sfstreak">最長連続SF以上</option><option value="qftosf">近年QF→SF率（QF+ 3回以上）</option><option value="appearances">収録大会数</option><option value="m1score">M-1ポイント</option><option value="kocscore">KOCポイント</option><option value="m1count">M-1収録回数</option><option value="koccount">KOC収録回数</option><option value="name">名前順</option><option value="formed">結成年順</option></select></label><div class="utilityactions"><button id="viewToggle" class="btn viewbtn" type="button">コンパクト</button><button id="reset" class="btn resetbtn" type="button">リセット</button><button id="share" class="btn" type="button">共有</button><button id="csv" class="btn" type="button">CSV</button></div></div>
+<div class="utilitybar"><label class="sortlabel">SORT <select id="sort" class="sort"><option value="recent">最近の戦績順</option><option value="extended" selected>拡張総合ポイント</option><option value="score">M-1／KOC本体ポイント</option><option value="dual">二刀流指数</option><option value="average">1大会平均ポイント</option><option value="streak">最長連続収録</option><option value="sfstreak">最長連続SF以上</option><option value="qftosf">近年QF→SF率（QF+ 3回以上）</option><option value="appearances">収録大会数</option><option value="m1score">M-1ポイント</option><option value="kocscore">KOCポイント</option><option value="m1count">M-1収録回数</option><option value="koccount">KOC収録回数</option><option value="name">名前順</option><option value="formed">結成年順</option></select></label><div class="utilityactions"><button id="viewToggle" class="btn viewbtn" type="button">コンパクト</button><button id="reset" class="btn resetbtn" type="button">リセット</button><button id="share" class="btn" type="button">共有</button><button id="csv" class="btn" type="button">CSV</button></div></div>
 <div class="analysisbar">
 <label class="analysisfield periodfield"><span>集計期間<small>PERIOD</small></span><select id="period" aria-label="集計期間"><option value="all">全期間</option><option value="recent3">直近3年（2023–2025）</option><option value="2025">2025年</option><option value="2024">2024年</option><option value="2023">2023年</option><option value="2022">2022年</option><option value="2021">2021年</option><option value="2020">2020年</option><option value="2019">2019年</option><option value="2018">2018年</option><option value="2017">2017年</option><option value="2016">2016年</option><option value="2015">2015年</option><option value="2014">2014年</option><option value="2013">2013年</option><option value="2012">2012年</option><option value="2011">2011年</option><option value="2010">2010年</option><option value="2009">2009年</option><option value="2008">2008年</option><option value="2007">2007年</option><option value="2006">2006年</option><option value="2005">2005年</option><option value="2004">2004年</option><option value="2003">2003年</option><option value="2002">2002年</option><option value="2001">2001年</option><option value="2000">2000年</option><option value="1999">1999年</option><option value="1998">1998年</option><option value="1997">1997年</option><option value="1996">1996年</option><option value="1995">1995年</option><option value="1994">1994年</option><option value="1993">1993年</option><option value="1992">1992年</option><option value="1991">1991年</option><option value="1990">1990年</option></select></label>
 <label class="analysisfield"><span>得点方法<small>SCORING MODE</small></span><select id="scoreMode" aria-label="得点対象"><option value="all">全ラウンド・通常配点</option><option value="r3">3回戦だけを得点</option><option value="qf">準々決勝だけを得点</option><option value="sf">準決勝だけを得点</option><option value="final">決勝だけを得点</option><option value="win">優勝だけを得点</option></select></label>
@@ -865,4 +902,52 @@ body:not(.home-index) .ref-sidebar{display:flex}body:not(.home-index) .wrap{marg
 @media(max-width:760px){.ref-sidebar{display:none!important}.ref-mobile-head{display:flex;position:relative;z-index:70;height:70px;background:#faf9f4;border-bottom:1px solid #ddd8cd;align-items:center;justify-content:space-between;padding:0 18px;color:#111}.ref-mobile-logo{text-decoration:none;color:#111}.ref-mobile-logo b{display:block;font-family:Georgia,'Yu Mincho','Hiragino Mincho ProN',serif;font-size:25px;font-weight:500}.ref-mobile-logo span{display:block;font-size:8px;letter-spacing:.2em;margin-top:2px}.ref-menu-button{width:50px;height:58px;padding:10px 4px 4px;border:0;background:transparent;color:#111}.ref-menu-button i{display:block;width:31px;height:1px;margin:6px auto;background:#111}.ref-menu-button span{display:block;margin-top:4px;font-size:8px;letter-spacing:.12em}.ref-mobile-menu{display:block;position:absolute;z-index:69;top:70px;left:0;right:0;background:#faf9f4;border-bottom:1px solid #ccc7bc;padding:6px 18px 16px}.ref-mobile-menu[hidden]{display:none}.ref-mobile-menu nav{display:grid}.ref-mobile-menu a{display:flex;justify-content:space-between;padding:12px 0;border-bottom:1px solid #e1ddd3;color:#111;text-decoration:none;font-size:11px;letter-spacing:.12em}.ref-mobile-menu a span{font-family:'Yu Mincho','Hiragino Mincho ProN',serif;color:#777;letter-spacing:0}.home-index .wrap,body:not(.home-index) .wrap{margin-left:0}.home-index .wrap{padding:0 14px 22px}.home-index .hero{margin:0 -14px;min-height:275px;padding:42px 26px 26px;grid-template-columns:minmax(0,1fr) 180px;background-position:58% center}.home-index .hero h1{font-size:50px}.home-index .hero .lead{font-size:13px}.home-index .heroaside .hero-era{font-size:6px}.home-index .heroaside small{top:90px;font-size:13px}.home-index .edstats{grid-template-columns:repeat(4,1fr)}.home-index .edstat{padding:18px 10px}.home-index .edstat b{font-size:34px}.home-index .edstat span{font-size:7px}.home-index .edstat-copy{display:none}.home-index .edfeature{grid-template-columns:.92fr 1.08fr;gap:10px}.home-index .edfeature-copy h2{font-size:29px}.home-index .edfeature-copy p{font-size:9px;line-height:1.8}.home-index .homecanvas{height:245px}.home-index .edfeature-rank{grid-column:1/-1}.home-index .edranking{grid-template-columns:1fr;gap:6px}.home-index .edlower{grid-template-columns:1fr 1fr}.home-index .edpanel{padding:0 10px 10px}.home-index .edpanel:first-child{padding-left:0}.home-index .edpanel:nth-child(2){padding-right:0}.home-index .edpickup{grid-column:1/-1;padding:14px 0 0;border-top:1px solid var(--rule)}.home-index .edminihead b{font-size:20px}.home-index .edpickups{grid-template-columns:repeat(3,1fr)}.home-index .footer{padding-bottom:18px}}
 @media(max-width:480px){.home-index .hero{grid-template-columns:minmax(0,1fr) 135px;min-height:265px;padding:38px 18px 24px}.home-index .hero h1{font-size:40px}.home-index .hero .lead{font-size:11px}.home-index .heroaside small{font-size:11px;top:82px}.home-index .edstats{grid-template-columns:repeat(4,minmax(0,1fr))}.home-index .edstat{padding:14px 6px}.home-index .edstat b{font-size:28px}.home-index .edstat span{font-size:6px}.home-index .edfeature{grid-template-columns:1fr}.home-index .edfeature-chart{border-left:0;border-right:0;padding:0}.home-index .edfeature-copy{padding-right:0}.home-index .homecanvas{height:260px}.home-index .edfeature-rank{border-top:1px solid var(--rule)}.home-index .edlower{grid-template-columns:1fr 1fr}.home-index .edminihead b{font-size:17px}.home-index .edforecastlist .name{font-size:9px}.home-index .edbacktesttable{font-size:7px}.home-index .edbacktesttable th,.home-index .edbacktesttable td{padding:6px 2px}.home-index .edpickup-banner{height:92px}.home-index .edpickups{gap:5px}.home-index .edpickupitem{padding:8px 7px}.home-index .footer-main{grid-template-columns:1fr}}
 </style>
-</body></html>
+
+<style>
+/* v233 restored live content */
+.home-index .edcontesttabs{display:grid;grid-template-columns:1fr 1fr;margin:0 0 8px;border-bottom:1px solid #cfcabe}.home-index .edcontesttabs button{appearance:none;border:0;border-right:1px solid #e1ddd3;background:#e9e6df;color:#252525;font:inherit;font-size:9px;letter-spacing:.09em;padding:7px 8px;cursor:pointer}.home-index .edcontesttabs button:last-child{border-right:0}.home-index .edcontesttabs button.on{background:#d94943;color:#fff}.home-index .edfeature-chart canvas{cursor:pointer}.home-index .edcharttip{background:#fbfaf6;color:#222;border-color:#bdb8ad;box-shadow:0 8px 24px rgba(0,0,0,.12)}.home-index .edcharttip b{color:#111}.home-index .edranking:empty:after,.home-index .edforecastlist:empty:after,.home-index #homeBacktestTable:empty:after,.home-index .edpickups:empty:after{content:'DATA LOADING…';display:block;color:#8c877f;font-size:9px;letter-spacing:.12em;padding:12px 0}.home-index .edstat b:empty:after{content:'—'}
+</style>
+
+<style>
+/* v234 priority navigation: TOTAL POWER / NEXT STAR / AGENCY / FORECAST */
+.home-index #primaryTabs.prioritytabs{display:grid!important;grid-template-columns:repeat(4,minmax(0,1fr));margin:24px 0 0;border-top:1px solid var(--rule);border-bottom:1px solid var(--rule);background:transparent;position:relative;z-index:20}.home-index .prioritytab{min-width:0;border:0;border-right:1px solid var(--rule);border-radius:0;background:transparent;color:#777;padding:15px 16px;text-align:left;display:flex;align-items:flex-end;justify-content:space-between;gap:8px}.home-index .prioritytab:last-child{border-right:0}.home-index .prioritytab strong{display:block;color:#252525;font-size:10px;letter-spacing:.12em}.home-index .prioritytab span span{display:block;margin-top:4px;color:#77736c;font-family:'Yu Mincho','Hiragino Mincho ProN',serif;font-size:10px;letter-spacing:0}.home-index .prioritytab i{font-style:normal;color:#aaa49b;font-size:8px;letter-spacing:.12em}.home-index .prioritytab.on{background:#ece8df}.home-index .prioritytab.on strong{color:#111}.home-index .prioritytab.on:after{content:"";position:absolute}.home-index .priorityintro{display:block!important;padding:24px 2px 18px;border-bottom:1px solid var(--rule);color:#111}.home-index .priorityintro>span{display:block;color:#77736c;font-size:8px;letter-spacing:.16em}.home-index .priorityintro h2{margin:7px 0 6px;font-family:'Yu Mincho','Hiragino Mincho ProN',serif;font-size:34px;font-weight:600;letter-spacing:.01em}.home-index .priorityintro p{margin:0;max-width:760px;color:#5f5b54;font-family:'Yu Mincho','Hiragino Mincho ProN',serif;font-size:11px;line-height:1.8}
+/* The original reference home hid all tools; v234 selectively restores the active priority page. */
+body.home-index.priority-total #search,body.home-index.priority-total .sectionlabel,body.home-index.priority-total .stats,body.home-index.priority-total #grid,body.home-index.priority-total #comparebar,body.home-index.priority-nextstar .nextstar.nextstar-v2,body.home-index.priority-nextstar .featurebar,body.home-index.priority-nextstar #search,body.home-index.priority-nextstar .sectionlabel,body.home-index.priority-nextstar .stats,body.home-index.priority-nextstar #grid,body.home-index.priority-nextstar #comparebar{display:block!important}
+body.home-index.priority-total #grid,body.home-index.priority-nextstar #grid{display:grid!important}
+body.home-index.priority-total .stats,body.home-index.priority-nextstar .stats{display:grid!important}
+body.home-index.priority-nextstar .featurebar{display:flex!important}
+body.home-index.priority-agency #agencyTabs{display:flex!important}
+body.home-index.priority-agency #agencyDashboard:not([hidden]),body.home-index.priority-agency #agencyEvolution:not([hidden]),body.home-index.priority-agency #agencyTournament:not([hidden]),body.home-index.priority-agency #agencyInsights:not([hidden]),body.home-index.priority-agency #agencyVisuals:not([hidden]){display:block!important}
+body.home-index.priority-forecast #discoveryRoot{display:block!important}
+body.home-index.priority-total .nextstar.nextstar-v2,body.home-index.priority-total .featurebar,body.home-index.priority-total #analytics{display:none!important}
+/* Editorial treatment for the restored database controls. */
+body.home-index.priority-total #search,body.home-index.priority-nextstar #search{position:relative;top:auto;margin:0;padding:14px 0 12px;background:transparent;border-bottom:1px solid var(--rule);backdrop-filter:none;color:#222}
+body.home-index.priority-total #search input,body.home-index.priority-nextstar #search input{background:#faf9f4;color:#111;border:1px solid #cfcabe;border-radius:0}
+body.home-index.priority-total #search select,body.home-index.priority-nextstar #search select{background:#faf9f4;color:#222;border:1px solid #cfcabe;border-radius:0}
+body.home-index.priority-total #search .pill,body.home-index.priority-nextstar #search .pill,body.home-index.priority-total #search .btn,body.home-index.priority-nextstar #search .btn{background:transparent;color:#444;border-color:#c8c3b9;border-radius:0}
+body.home-index.priority-total #search .pill.on,body.home-index.priority-nextstar #search .pill.on{background:#222;color:#fff;border-color:#222}
+body.home-index.priority-total .sectionlabel,body.home-index.priority-nextstar .sectionlabel{margin:22px 0 8px;color:#111;border-top:1px solid var(--rule);padding-top:14px}
+body.home-index.priority-total .sectionlabel b,body.home-index.priority-nextstar .sectionlabel b{color:#111}
+body.home-index.priority-total .stats,body.home-index.priority-nextstar .stats{border-top:1px solid var(--rule);border-bottom:1px solid var(--rule);gap:0;background:transparent}
+body.home-index.priority-total .stat,body.home-index.priority-nextstar .stat{background:transparent;border:0;border-right:1px solid var(--rule);border-radius:0;color:#111}
+body.home-index.priority-total .stat b,body.home-index.priority-nextstar .stat b{color:#111}
+body.home-index.priority-total .stat small,body.home-index.priority-nextstar .stat small{color:#77736c}
+body.home-index.priority-total .card,body.home-index.priority-nextstar .card{background:transparent;border:0;border-top:1px solid #d7d2c8;border-radius:0;color:#222;box-shadow:none}
+body.home-index.priority-total .card .name,body.home-index.priority-nextstar .card .name{color:#111}
+body.home-index.priority-total .card .best,body.home-index.priority-nextstar .card .best,body.home-index.priority-total .card .meta,body.home-index.priority-nextstar .card .meta{color:#666}
+body.home-index.priority-nextstar .nextstar.nextstar-v2{margin:0;padding:18px 0;border-top:0;border-bottom:1px solid var(--rule);background:transparent;color:#111}
+body.home-index.priority-nextstar .nextstar h2{font-family:'Yu Mincho','Hiragino Mincho ProN',serif;color:#111;font-size:28px}.home-index.priority-nextstar .nextstar p{color:#666}
+body.home-index.priority-nextstar .finderbtn{border-radius:0;background:transparent;color:#444;border-color:#c8c3b9}.home-index.priority-nextstar .finderbtn.on{background:#222;color:#fff;border-color:#222}
+body.home-index.priority-agency #agencyTabs,body.home-index.priority-forecast .discoverytabs{position:sticky;top:0;z-index:30}
+/* Active sidebar state for the new four-page order. */
+.ref-nav [data-priority-nav].active:before{background:#d94a45}.ref-nav [data-priority-nav].active span{color:#d94a45}
+@media(max-width:760px){.home-index #primaryTabs.prioritytabs{position:sticky;top:70px;z-index:55;margin:14px -14px 0;background:#f6f3eb;overflow-x:auto;grid-template-columns:repeat(4,minmax(92px,1fr));scrollbar-width:none}.home-index #primaryTabs.prioritytabs::-webkit-scrollbar{display:none}.home-index .prioritytab{padding:12px 10px;min-height:58px}.home-index .prioritytab strong{font-size:8px}.home-index .prioritytab span span{font-size:8px}.home-index .priorityintro{padding:18px 0 14px}.home-index .priorityintro h2{font-size:28px}.home-index .priorityintro p{font-size:10px}.home-index.priority-total #search,.home-index.priority-nextstar #search{padding-top:10px}.home-index.priority-total .stats,.home-index.priority-nextstar .stats{grid-template-columns:repeat(2,1fr)}.home-index.priority-agency #agencyTabs,.home-index.priority-forecast .discoverytabs{top:128px}}
+@media(max-width:480px){.home-index .prioritytab span span{display:none}.home-index .prioritytab{justify-content:center;text-align:center;padding:11px 7px}.home-index .prioritytab i{display:none}.home-index .priorityintro h2{font-size:25px}}
+</style>
+
+<style>
+body.home-index.priority-about #about{display:block!important}
+.ref-mobile-menu [data-priority-nav].active{color:#d94a45}
+.ref-mobile-menu [data-priority-nav].active span{color:#d94a45}
+</style>
+\n<style>\n/* v235 TOTAL POWER editorial page */\n.home-index #totalPowerPage{display:none}.home-index.priority-total #totalPowerPage{display:grid!important;grid-template-columns:minmax(0,1.55fr) minmax(300px,.75fr);grid-template-areas:"controls controls" "top top" "land comp" "tiers tiers" "rank rank";column-gap:30px;row-gap:0;color:#151515;padding:0 0 38px}\n.home-index.priority-total #search,.home-index.priority-total .sectionlabel,.home-index.priority-total .stats,.home-index.priority-total #grid,.home-index.priority-total #comparebar{display:none!important}.home-index.priority-total.total-detail-open #search{display:block!important}.home-index.priority-total.total-detail-open .sectionlabel{display:flex!important}.home-index.priority-total.total-detail-open .stats{display:grid!important}.home-index.priority-total.total-detail-open #grid{display:grid!important}.home-index.priority-total.total-detail-open #comparebar.show{display:flex!important}\n.tp-controls{grid-area:controls;display:flex;align-items:flex-end;gap:28px;padding:14px 0 18px;border-bottom:1px solid var(--rule)}.tp-controlgroup>span{display:block;margin:0 0 6px;color:#77736c;font-size:7px;letter-spacing:.17em}.tp-segments{display:flex;border:1px solid #c9c3b7}.tp-segments button{min-width:64px;height:31px;border:0;border-right:1px solid #c9c3b7;background:transparent;color:#5c5851;font:inherit;font-size:9px;letter-spacing:.08em;cursor:pointer}.tp-segments button:last-child{border-right:0}.tp-segments button.on{background:#191919;color:#fff}.tp-detail-toggle{margin-left:auto;height:32px;padding:0 2px;border:0;border-bottom:1px solid #7f7a72;background:transparent;color:#3e3a35;font:inherit;font-size:8px;letter-spacing:.11em;cursor:pointer}\n.tp-top10{grid-area:top;padding:28px 0 30px;border-bottom:1px solid var(--rule)}.tp-sectionhead{display:flex;align-items:flex-end;justify-content:space-between;gap:18px;margin:0 0 16px}.tp-sectionhead>div>span{display:block;color:#77736c;font-size:7px;letter-spacing:.18em}.tp-sectionhead h3{margin:5px 0 0;font-family:Georgia,'Yu Mincho','Hiragino Mincho ProN',serif;font-weight:500;font-size:34px;line-height:1;color:#111}.tp-sectionhead p{margin:0;color:#77736c;font-family:'Yu Mincho','Hiragino Mincho ProN',serif;font-size:9px}.tp-sectionhead.compact h3{font-size:24px}.tp-toplist{display:grid}.tp-toprow{display:grid;grid-template-columns:42px minmax(170px,.9fr) minmax(280px,2fr) 70px;gap:14px;align-items:center;min-height:58px;border-top:1px solid #ddd8cd;cursor:pointer}.tp-toprow:last-child{border-bottom:1px solid #ddd8cd}.tp-rank{font-family:Georgia,serif;font-size:18px;color:#6d6962}.tp-team b{display:block;font-family:'Yu Mincho','Hiragino Mincho ProN',serif;font-size:16px;font-weight:600;color:#111}.tp-team small{display:block;margin-top:3px;color:#858078;font-size:8px;letter-spacing:.03em}.tp-stack{height:10px;display:flex;background:#e4e0d7;overflow:hidden}.tp-stack i{display:block;height:100%}.tp-stack .m1{background:var(--m1r)}.tp-stack .koc{background:var(--kocb)}.tp-stack .bonus{background:var(--gold)}.tp-stacklabel{display:flex;gap:12px;margin-top:5px;color:#77736c;font-size:7px}.tp-stacklabel .m1{color:#ad3936}.tp-stacklabel .koc{color:#3f6e9f}.tp-stacklabel .bonus{color:#9b7419}.tp-score{text-align:right}.tp-score b{display:block;font-family:Georgia,serif;font-size:22px;font-weight:500;color:#111}.tp-score span{display:block;color:#88837b;font-size:7px;letter-spacing:.12em}.tp-toprow:hover .tp-team b{text-decoration:underline;text-underline-offset:3px}\n.tp-composition{grid-area:comp;padding:24px 0 26px;border-bottom:1px solid var(--rule)}.tp-comp-list{display:grid;gap:9px}.tp-comprow{display:grid;grid-template-columns:minmax(90px,1fr) 1.4fr 36px;gap:8px;align-items:center;cursor:pointer}.tp-comprow b{font-family:'Yu Mincho','Hiragino Mincho ProN',serif;font-size:9px;color:#222;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.tp-compbar{height:8px;display:flex;background:#e4e0d7}.tp-compbar i{height:100%}.tp-compbar .m1{background:var(--m1r)}.tp-compbar .koc{background:var(--kocb)}.tp-compbar .bonus{background:var(--gold)}.tp-comprow em{font-style:normal;text-align:right;font-size:8px;color:#666}\n.tp-landscape{grid-area:land;padding:24px 0 26px;border-right:1px solid var(--rule);padding-right:28px;border-bottom:1px solid var(--rule)}.tp-canvaswrap{position:relative}.tp-canvaswrap canvas{display:block;width:100%;height:365px}.tp-tip{display:none;position:absolute;z-index:5;pointer-events:none;padding:8px 10px;background:#191919;color:#f5f3ed;border:1px solid #333;font-size:8px;line-height:1.55}.tp-tip.show{display:block}\n.tp-tiers{grid-area:tiers;padding:24px 0 26px;border-bottom:1px solid var(--rule)}.tp-tiergrid{display:grid;grid-template-columns:repeat(5,1fr);border-top:1px solid #d9d4c9;border-bottom:1px solid #d9d4c9}.tp-tier{padding:15px 14px;border-right:1px solid #d9d4c9}.tp-tier:last-child{border-right:0}.tp-tier span{display:block;color:#77736c;font-size:8px;letter-spacing:.1em}.tp-tier b{display:block;margin-top:6px;font-family:Georgia,serif;font-size:28px;font-weight:500;color:#111}.tp-tier small{display:block;margin-top:4px;color:#8c877f;font-size:7px}\n.tp-ranking{grid-area:rank;padding:28px 0 0}.tp-rankingtools{display:flex;align-items:center;gap:14px}.tp-rankingtools input{width:200px;height:32px;border:0;border-bottom:1px solid #aaa49a;border-radius:0;background:transparent;color:#111;font:inherit;font-size:11px}.tp-rankingtools span{color:#817c74;font-size:8px}.tp-tablewrap{overflow:auto;border-top:1px solid #cfc9bd}.tp-table{width:100%;border-collapse:collapse;min-width:690px}.tp-table th,.tp-table td{padding:10px 8px;border-bottom:1px solid #ddd8cd;text-align:right;font-size:9px;color:#2b2926;font-variant-numeric:tabular-nums}.tp-table th{color:#77736c;font-weight:500;font-size:7px;letter-spacing:.09em}.tp-table th:first-child,.tp-table td:first-child{text-align:left;width:46px}.tp-table th:nth-child(2),.tp-table td:nth-child(2){text-align:left}.tp-table td:nth-child(2){font-family:'Yu Mincho','Hiragino Mincho ProN',serif;font-size:11px;font-weight:600;cursor:pointer}.tp-table tr:hover td{background:rgba(0,0,0,.025)}.tp-table .mainpt{font-family:Georgia,serif;font-size:12px}.tp-table .m1pt{color:#a63f3b}.tp-table .kocpt{color:#416d99}.tp-table .bonuspt{color:#99731b}.tp-more{display:block;margin:18px auto 0;padding:8px 18px;border:0;border-bottom:1px solid #777;background:transparent;color:#333;font:inherit;font-size:9px;letter-spacing:.12em;cursor:pointer}\n@media(max-width:900px){.home-index.priority-total #totalPowerPage{grid-template-columns:1fr;grid-template-areas:"controls" "top" "comp" "rank" "land" "tiers"}.tp-landscape{border-right:0;padding-right:0}.tp-toprow{grid-template-columns:38px minmax(140px,.8fr) minmax(220px,1.7fr) 62px}.tp-tiergrid{grid-template-columns:repeat(5,1fr)}}\n@media(max-width:600px){.tp-controls{gap:12px;flex-wrap:wrap;padding:10px 0 14px}.tp-controlgroup{flex:1 1 145px}.tp-segments{width:100%}.tp-segments button{flex:1;min-width:0}.tp-detail-toggle{margin-left:0}.tp-sectionhead{align-items:flex-start;flex-direction:column;gap:6px}.tp-sectionhead h3{font-size:29px}.tp-sectionhead.compact h3{font-size:22px}.tp-toprow{grid-template-columns:30px minmax(0,1fr) 52px;gap:9px;padding:11px 0;min-height:0}.tp-toprow .tp-stackwrap{grid-column:2/4;grid-row:2}.tp-team b{font-size:15px}.tp-score b{font-size:19px}.tp-stacklabel{gap:8px}.tp-comp-list{gap:11px}.tp-comprow{grid-template-columns:100px 1fr 32px}.tp-canvaswrap canvas{height:300px}.tp-tiergrid{grid-template-columns:repeat(2,1fr)}.tp-tier:nth-child(2n){border-right:0}.tp-tier:last-child{grid-column:1/-1;border-top:1px solid #d9d4c9}.tp-rankingtools{width:100%;justify-content:space-between}.tp-rankingtools input{width:min(190px,60vw)}}\n</style>\n</body></html>
