@@ -1,0 +1,28 @@
+M-1 × KOC DATABASE v252 — STATIC / STRUCTURAL AUDIT
+Checked: 2026-09-15
+
+[PASS] Cover controls: ENTER DATABASE = 1 / SKIP = 0
+[PASS] Approved main copy retained: 「面白いを、可視化する。」
+[PASS] Approved description retained: 「M-1とKOC、ふたつの頂点の記録を横断。／戦績をたどり、比べ、次を読む。」
+[PASS] Heavy db.js / core.js preloads removed from the cover first paint
+[PASS] Cover full-image CSS filter removed; fixed body texture disabled while cover is open
+[PASS] Light theme metadata and light HTML background aligned to editorial UI
+[PASS] Duplicate HTML IDs: 0
+[PASS] Broken internal hash links: 0 (legacy #priorityTabs corrected to #primaryTabs)
+[PASS] Broken ARIA ID references: 0
+[PASS] Missing local assets: 0
+[PASS] Images without alt: 0
+[PASS] target=_blank links without safe rel: 0
+[PASS] Empty/unlabelled buttons: 0
+[PASS] CSS parse errors: 0
+[PASS] core.js syntax: PASS
+[PASS] patches.js syntax: PASS
+[PASS] DB raw records: 1,748 / duplicate exact names: 0 / malformed records: 0
+[PASS] M-1 2026 forecast: formation year < 2011 excluded (2011 remains eligible)
+[PASS] M-1/KOC forecast: prior champions excluded
+[FIX] Forecast note corrected from “2011年以前” to “2010年以前” to match logic
+[PASS] Info dialog now has aria-labelledby=dialogTitle
+[PASS] Temporary index.html.tmp removed
+
+NOTE:
+This environment blocks local Chromium navigation (ERR_BLOCKED_BY_ADMINISTRATOR), so browser-rendered screenshot QA was not available in this audit. The checks above are static/structural/code audits. PC rendering was previously confirmed by the user; iPhone should be rechecked after deployment.

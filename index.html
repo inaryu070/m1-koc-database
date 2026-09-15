@@ -2,11 +2,11 @@
 <html lang="ja">
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>M-1 × KOC 戦績データベース — 2026-09-14</title>
+<title>M-1 × KOC 戦績データベース — 2026-09-15</title>
 <meta name="description" content="M-1グランプリとキングオブコントの主要戦績を横断検索。外部賞レースの確定ボーナスも分離表示できる非公式スコア分析データベース。">
 <meta property="og:title" content="M-1 × KOC 戦績データベース">
 <meta property="og:description" content="M-1とキングオブコントの主要戦績を横断。予選の強さと外部賞レース実績からネクストスターを探す。">
-<meta property="og:type" content="website"><meta property="og:url" content="https://inaryu070.github.io/m1-koc-database/"><meta property="og:site_name" content="M-1 × KOC 戦績データベース"><meta property="og:image" content="https://inaryu070.github.io/m1-koc-database/ogp.png"><meta property="og:image:type" content="image/png"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630"><meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" content="M-1 × KOC 戦績データベース"><meta name="twitter:description" content="面白いを、可視化する。M-1とKOCの戦績を横断検索・分析。"><meta name="twitter:image" content="https://inaryu070.github.io/m1-koc-database/ogp.png"><link rel="canonical" href="https://inaryu070.github.io/m1-koc-database/"><link rel="preload" href="db.js" as="script"><link rel="preload" href="core.js" as="script"><meta name="theme-color" content="#0b0b0c"><meta name="color-scheme" content="dark"><meta name="robots" content="index,follow,max-image-preview:large"><meta name="author" content="Ryutaro Inami"><meta name="application-name" content="M-1 × KOC 戦績データベース"><meta property="og:locale" content="ja_JP"><meta property="og:image:alt" content="M-1 × KOC 戦績データベース — 面白いを、可視化する。"><meta name="twitter:image:alt" content="M-1 × KOC 戦績データベース — 面白いを、可視化する。">
+<meta property="og:type" content="website"><meta property="og:url" content="https://inaryu070.github.io/m1-koc-database/"><meta property="og:site_name" content="M-1 × KOC 戦績データベース"><meta property="og:image" content="https://inaryu070.github.io/m1-koc-database/ogp.png"><meta property="og:image:type" content="image/png"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630"><meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" content="M-1 × KOC 戦績データベース"><meta name="twitter:description" content="面白いを、可視化する。M-1とKOCの戦績を横断検索・分析。"><meta name="twitter:image" content="https://inaryu070.github.io/m1-koc-database/ogp.png"><link rel="canonical" href="https://inaryu070.github.io/m1-koc-database/"><meta name="theme-color" content="#f7f4ec"><meta name="color-scheme" content="light"><meta name="robots" content="index,follow,max-image-preview:large"><meta name="author" content="Ryutaro Inami"><meta name="application-name" content="M-1 × KOC 戦績データベース"><meta property="og:locale" content="ja_JP"><meta property="og:image:alt" content="M-1 × KOC 戦績データベース — 面白いを、可視化する。"><meta name="twitter:image:alt" content="M-1 × KOC 戦績データベース — 面白いを、可視化する。">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' fill='%230b0b0c'/%3E%3Cpath d='M14 14h36v36H14z' fill='none' stroke='%23dfbc68' stroke-width='2'/%3E%3Ctext x='32' y='39' fill='%23f4f4f2' font-size='20' font-family='Arial' text-anchor='middle'%3EM×K%3C/text%3E%3C/svg%3E">
 <style>
 :root{--bg:#0b0b0c;--panel:#141416;--soft:#1b1b1e;--line:#303034;--text:#f4f4f2;--body:#c7c7c3;--muted:#858589;--paper:#f4f3ef;--paper-ink:#161616;--m1:#ef5a54;--koc:#6ba5df;--seed:#dfbc68}
@@ -293,7 +293,7 @@ button,select,input{touch-action:manipulation}
 body.cover-open{overflow:hidden!important}
 body.cover-open>.wrap,body.cover-open>.ref-sidebar,body.cover-open>.ref-mobile-head,body.cover-open>.ref-mobile-menu{visibility:hidden!important;pointer-events:none!important}
 body:not(.cover-open)>.wrap,body:not(.cover-open)>.ref-sidebar,body:not(.cover-open)>.ref-mobile-head{visibility:visible!important;pointer-events:auto!important}
-#coverEnter,#coverSkip{pointer-events:auto!important;touch-action:manipulation;-webkit-tap-highlight-color:transparent}
+#coverEnter{pointer-events:auto!important;touch-action:manipulation;-webkit-tap-highlight-color:transparent}
 @media(max-width:830px){#cover{grid-template-rows:40svh 60svh;height:100svh;min-height:100svh}.cover-art{transform:none!important}.cover-copy{overflow:auto;-webkit-overflow-scrolling:touch}}
 </style>
 </head>
@@ -305,10 +305,8 @@ body:not(.cover-open)>.wrap,body:not(.cover-open)>.ref-sidebar,body:not(.cover-o
       <div class="cover-brandwords">EXPLORE<br>ANALYZE<br>DISCOVER</div>
     </header>
 
-    <div class="cover-editorial-copy">
-      <span class="cover-small-kicker">COMEDY LIVES FOREVER.</span>
-      <h1>お笑いの、<br>これまでと、これからを。<br>データで。</h1>
-      <p>M-1とKOC、ふたつの頂点のデータを<br>探せる、比べられる、発見できる。<br>数字の先にある、まだ見ぬ面白いに出会うために。</p>
+    <div class="cover-editorial-copy cover-description-only">
+      <p class="cover-deck"><span class="cover-deck-line">M-1とKOC、ふたつの頂点の記録を横断。</span><span class="cover-deck-line">戦績をたどり、比べ、次を読む。</span></p>
     </div>
 
     <div class="cover-stats" aria-label="データベース概要">
@@ -319,7 +317,6 @@ body:not(.cover-open)>.wrap,body:not(.cover-open)>.ref-sidebar,body:not(.cover-o
 
     <div class="cover-actions">
       <button class="cover-enter" id="coverEnter" type="button"><span>ENTER DATABASE</span><span>→</span></button>
-      <button class="cover-subaction" id="coverSkip" type="button"><span>SKIP</span><span>→</span></button>
     </div>
 
     <div class="cover-creditrow">
@@ -329,7 +326,8 @@ body:not(.cover-open)>.wrap,body:not(.cover-open)>.ref-sidebar,body:not(.cover-o
 
     <section class="cover-update-log" aria-label="更新履歴">
       <div class="cover-update-head"><b><i></i>UPDATE LOG</b><span>RECENT</span></div>
-      <div class="cover-update-row"><time>2026.09.15</time><b>v243</b><span>扉デザインを新仕様へ統一</span></div>
+      <div class="cover-update-row"><time>2026.09.15</time><b>v252</b><span>全体監査・扉をENTER一本化</span></div>
+      <div class="cover-update-row"><time>2026.09.15</time><b>v251</b><span>扉コピーを固定・文字組みを整理</span></div>
       <div class="cover-update-row"><time>2026.09.15</time><b>v242</b><span>個別詳細・視認性を全面修正</span></div>
       <div class="cover-update-row"><time>2026.09.15</time><b>v240</b><span>扉ページを再設計</span></div>
       <div class="cover-update-row"><time>2026.09.15</time><b>v238</b><span>データ描画不具合を修正</span></div>
@@ -354,14 +352,14 @@ body:not(.cover-open)>.wrap,body:not(.cover-open)>.ref-sidebar,body:not(.cover-o
 <aside class="ref-sidebar" id="refSidebar" aria-label="メインナビゲーション">
   <a class="ref-logo" href="#top" data-priority-home="true"><b>M-1 × KOC</b><span>COMEDY DATABASE</span></a>
   <nav class="ref-nav">
-    <a class="active" href="#priorityTabs" data-priority-nav="total"><b>TOTAL POWER</b><span>総合ポイント</span></a>
-    <a href="#priorityTabs" data-priority-nav="nextstar"><b>NEXT STAR</b><span>次に来るコンビ</span></a>
-    <a href="#priorityTabs" data-priority-nav="agency"><b>AGENCY</b><span>事務所で見る</span></a>
-    <a href="#priorityTabs" data-priority-nav="forecast"><b>FORECAST</b><span>決勝を予測する</span></a>
+    <a class="active" href="#primaryTabs" data-priority-nav="total"><b>TOTAL POWER</b><span>総合ポイント</span></a>
+    <a href="#primaryTabs" data-priority-nav="nextstar"><b>NEXT STAR</b><span>次に来るコンビ</span></a>
+    <a href="#primaryTabs" data-priority-nav="agency"><b>AGENCY</b><span>事務所で見る</span></a>
+    <a href="#primaryTabs" data-priority-nav="forecast"><b>FORECAST</b><span>決勝を予測する</span></a>
     <a href="#about" data-priority-nav="about"><b>ABOUT</b><span>このサイトについて</span></a>
   </nav>
   <div class="ref-sidebar-bottom">
-  <p class="ref-sidebar-copy">お笑いの、<br>これまでと、これからを。<br>データで。</p>
+  <p class="ref-sidebar-copy"><span>面白いを、</span><span>可視化する。</span></p>
   <div class="ref-account">
     <span>CREATED BY</span>
     <b>RYUTARO INAMI</b>
@@ -376,10 +374,10 @@ body:not(.cover-open)>.wrap,body:not(.cover-open)>.ref-sidebar,body:not(.cover-o
 </header>
 <div class="ref-mobile-menu" id="refMobileMenu" hidden>
   <nav>
-    <a href="#priorityTabs" data-priority-nav="total">TOTAL POWER <span>総合ポイント</span></a>
-    <a href="#priorityTabs" data-priority-nav="nextstar">NEXT STAR <span>次に来るコンビ</span></a>
-    <a href="#priorityTabs" data-priority-nav="agency">AGENCY <span>事務所で見る</span></a>
-    <a href="#priorityTabs" data-priority-nav="forecast">FORECAST <span>決勝を予測する</span></a>
+    <a href="#primaryTabs" data-priority-nav="total">TOTAL POWER <span>総合ポイント</span></a>
+    <a href="#primaryTabs" data-priority-nav="nextstar">NEXT STAR <span>次に来るコンビ</span></a>
+    <a href="#primaryTabs" data-priority-nav="agency">AGENCY <span>事務所で見る</span></a>
+    <a href="#primaryTabs" data-priority-nav="forecast">FORECAST <span>決勝を予測する</span></a>
     <a href="#about" data-priority-nav="about">ABOUT <span>このサイトについて</span></a>
   </nav>
 </div>
@@ -387,7 +385,7 @@ body:not(.cover-open)>.wrap,body:not(.cover-open)>.ref-sidebar,body:not(.cover-o
 <header class="sitehead"><a class="brand" href="#top">M-1 × KOC DATABASE</a><nav class="nav"><a href="#search">DATABASE</a><a href="#agencyTabs">AGENCY</a><a href="#discoveryRoot">DISCOVERY</a><a href="#about">ABOUT</a></nav></header>
 <main id="top"><section class="hero"><div><div class="eyebrow">COMEDY COMPETITION DATABASE / LAST UPDATE 2026-09-14</div>
 <h1>面白いを、<br>可視化する。</h1>
-<p class="lead">M-1とKOC、ふたつの頂点のデータを<br>探せる、比べられる、発見できる。</p></div><aside class="heroaside"><div class="hero-era">M-1 GRAND PRIX<br>×<br>KING OF CONTE<br>2015 — 2025</div><small>数字の先に、<br>まだ見ぬ<br>面白いがある。</small><div class="hero-explore">EXPLORE<br>ANALYZE<br>DISCOVER</div><b id="heroCount">1,747</b><span>M-1 × KOCを横断する、お笑い戦績アーカイブ。</span></aside></section>
+<p class="lead"><span class="lead-line">M-1とKOC、ふたつの頂点の記録を横断。</span><span class="lead-line">戦績をたどり、比べ、次を読む。</span></p></div><aside class="heroaside"><div class="hero-era">M-1 GRAND PRIX<br>×<br>KING OF CONTE<br>2015 — 2025</div><small>数字の先に、<br>まだ見ぬ<br>面白いがある。</small><div class="hero-explore">EXPLORE<br>ANALYZE<br>DISCOVER</div><b id="heroCount">1,748</b><span>M-1 × KOCを横断する、お笑い戦績アーカイブ。</span></aside></section>
 <section class="edstats" id="edStats" aria-label="データベース概要指標">
   <div class="edstat"><b id="edTotal">—</b><span>TOTAL UNITS</span></div>
   <div class="edstat"><b id="edM1">—</b><span>M-1 TEAMS</span></div>
@@ -799,14 +797,13 @@ body:not(.cover-open)>.wrap,body:not(.cover-open)>.ref-sidebar,body:not(.cover-o
 </div>
 </main></div>
 <div class="sharemsg" id="sharemsg" role="status" aria-live="polite" aria-atomic="true">現在の検索条件をコピーしました</div><div class="overlay" id="overlay"></div><aside class="drawer" id="drawer"><div class="inner" id="detail"></div></aside>
-<dialog class="infodialog" id="infoDialog"><div class="dialoginner"><div class="dialoghead"><b id="dialogTitle">DATABASE GUIDE</b><button class="dialogclose" id="dialogClose" type="button" aria-label="閉じる">×</button></div><div id="dialogContent"></div></div></dialog>
+<dialog class="infodialog" id="infoDialog" aria-labelledby="dialogTitle"><div class="dialoginner"><div class="dialoghead"><b id="dialogTitle">DATABASE GUIDE</b><button class="dialogclose" id="dialogClose" type="button" aria-label="閉じる">×</button></div><div id="dialogContent"></div></div></dialog>
 
 <script id="appGateLoader">
 (()=>{
   const body=document.body;
   const cover=document.getElementById('cover');
   const enter=document.getElementById('coverEnter');
-  const skip=document.getElementById('coverSkip');
   let loadPromise=null;
 
   function setGate(open){
@@ -860,7 +857,6 @@ body:not(.cover-open)>.wrap,body:not(.cover-open)>.ref-sidebar,body:not(.cover-o
   }
 
   enter?.addEventListener('click',enterApp,{passive:false});
-  skip?.addEventListener('click',enterApp,{passive:false});
   window.M1KOC_GATE={open:()=>setGate(true),close:enterApp,load:loadApp,version:'v247'};
   setGate(true);
 })();
@@ -902,7 +898,7 @@ body:not(.cover-open)>.wrap,body:not(.cover-open)>.ref-sidebar,body:not(.cover-o
 <button id="dqAuditBtn" type="button">精度監査</button>
 <div id="dqAuditPanel" aria-hidden="true">
   <div class="dq-head">
-    <div><div class="dq-title">DATA QUALITY / 精度監査</div><div class="dq-sub">全1,747組の未確定項目を実データから自動集計</div></div>
+    <div><div class="dq-title">DATA QUALITY / 精度監査</div><div class="dq-sub">全1,748組の未確定項目を実データから自動集計</div></div>
     <button class="dq-close" id="dqAuditClose" type="button">閉じる</button>
   </div>
   <div class="dq-body">
@@ -1718,5 +1714,57 @@ body.cover-open{overflow:hidden!important}
 .lastyear-summary{display:grid;grid-template-columns:repeat(4,1fr);border-bottom:1px solid #cfc9bd}.lastyear-stat{padding:14px 12px;border-right:1px solid #ddd8cd}.lastyear-stat:last-child{border-right:0}.lastyear-stat small{display:block;color:#8a857d;font-size:7px;letter-spacing:.12em}.lastyear-stat b{display:block;margin-top:5px;font-family:Georgia,'Yu Mincho',serif;font-size:28px;font-weight:500;color:#111}.lastyear-feature{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:0;margin:20px 0 22px;border-top:1px solid #cfc9bd;border-bottom:1px solid #cfc9bd}.lastyear-feature article{padding:14px 12px;border-right:1px solid #ddd8cd;cursor:pointer}.lastyear-feature article:last-child{border-right:0}.lastyear-feature .rank{color:#c6a64d;font:500 22px Georgia,serif}.lastyear-feature h3{margin:6px 0 4px;color:#111;font-family:'Yu Mincho','Hiragino Mincho ProN',serif;font-size:15px;line-height:1.25}.lastyear-feature p{margin:0;color:#77736c;font-size:8px;line-height:1.55}.lastyear-feature b{display:block;margin-top:8px;color:#111;font-size:11px}.lastyear-listhead{display:flex;justify-content:space-between;padding:0 0 8px;color:#817c73;font-size:8px;letter-spacing:.14em;border-bottom:1px solid #aaa398}.lastyear-row{display:grid;grid-template-columns:44px minmax(160px,1.4fr) minmax(130px,.9fr) 90px 90px 80px 84px;gap:10px;align-items:center;padding:12px 4px;border-bottom:1px solid #ddd8cd;color:#222;cursor:pointer}.lastyear-row:hover{background:rgba(0,0,0,.025)}.lastyear-row .ly-rank{color:#aaa398;font:500 15px Georgia,serif}.lastyear-row .ly-name b{display:block;color:#111;font-family:'Yu Mincho','Hiragino Mincho ProN',serif;font-size:14px}.lastyear-row .ly-name span,.lastyear-row .ly-agency,.lastyear-row .ly-cell small{display:block;color:#89847c;font-size:8px;margin-top:3px}.lastyear-row .ly-cell b{display:block;color:#222;font-size:10px}.lastyear-row .ly-badge{display:inline-block;padding:3px 5px;border:1px solid #c9c3b8;color:#69645d;font-size:7px;margin-top:4px}.lastyear-row .ly-badge.warn{border-color:#d2b66a;color:#9b792b}.lastyear-row .ly-badge.active{border-color:#9db59e;color:#58735a}.lastyear-note{margin:16px 0 0;color:#77736c;font-size:8px;line-height:1.75}.lastyear-empty{padding:34px 0;color:#77736c;font-family:'Yu Mincho','Hiragino Mincho ProN',serif;font-size:12px}
 @media(max-width:900px){.lastyear-controls{grid-template-columns:1fr 1fr}.lastyear-feature{grid-template-columns:repeat(2,1fr)}.lastyear-feature article:nth-child(2n){border-right:0}.lastyear-row{grid-template-columns:34px minmax(150px,1.4fr) 100px 76px 76px}.lastyear-row .ly-agency,.lastyear-row .ly-latest{display:none}}
 @media(max-width:560px){.home-index.priority-nextstar .nextstar-modebar{margin:0 -14px 14px}.nextstar-modebtn{min-height:58px;padding:10px;font-size:8px}.lastyear-head{grid-template-columns:1fr 112px;gap:12px;padding-top:8px}.lastyear-head h2{font-size:31px}.lastyear-head p{font-size:9px}.lastyear-current{padding-left:10px}.lastyear-current b{font-size:30px}.lastyear-years{margin:12px -14px 14px;padding-left:14px}.lastyear-year{flex-basis:72px}.lastyear-controls{grid-template-columns:1fr 1fr;gap:8px}.lastyear-check{grid-column:1/-1}.lastyear-summary{grid-template-columns:repeat(2,1fr)}.lastyear-stat:nth-child(2){border-right:0}.lastyear-feature{grid-template-columns:1fr;margin-top:16px}.lastyear-feature article{border-right:0;border-bottom:1px solid #ddd8cd;display:grid;grid-template-columns:38px minmax(0,1fr) auto;gap:8px;align-items:center}.lastyear-feature article:last-child{border-bottom:0}.lastyear-feature h3{margin:0}.lastyear-feature p{grid-column:2/4}.lastyear-feature b{margin:0}.lastyear-row{grid-template-columns:30px minmax(0,1fr) 66px;gap:8px;padding:12px 0}.lastyear-row .ly-agency,.lastyear-row .ly-latest,.lastyear-row .ly-apps,.lastyear-row .ly-best{display:none}.lastyear-row .ly-name b{font-size:16px}.lastyear-row .ly-power{text-align:right}.lastyear-note{font-size:7.5px}}
+
+/* v251 — approved copy lock + typography cleanup */
+.cover-deck-line,.ref-sidebar-copy span,.lead-line{display:block}
+.cover-deck-line,.ref-sidebar-copy span,.lead-line{white-space:nowrap}
+#cover .cover-editorial-copy.cover-description-only{padding:clamp(42px,7vh,74px) 0 24px!important}
+#cover .cover-editorial-copy.cover-description-only .cover-deck{
+  margin:0!important;
+  max-width:31em;
+  color:#3f3b36!important;
+  font-family:'Yu Mincho','Hiragino Mincho ProN','Noto Serif JP',serif!important;
+  font-size:clamp(12px,1.05vw,14px)!important;
+  line-height:1.9!important;
+  letter-spacing:.015em!important;
+  font-feature-settings:"palt" 1;
+}
+#cover .cover-deck-line + .cover-deck-line{margin-top:.12em}
+#cover .cover-stage-main h2{font-feature-settings:"palt" 1;letter-spacing:-.035em!important}
+.ref-sidebar-copy{display:grid;gap:2px;line-height:1.42}
+.hero .lead{font-feature-settings:"palt" 1}
+.hero .lead-line + .lead-line{margin-top:.16em}
+@media(max-width:830px){
+  #cover .cover-editorial-copy.cover-description-only{padding:18px 0 14px!important}
+  #cover .cover-editorial-copy.cover-description-only .cover-deck{
+    max-width:none!important;
+    font-size:clamp(9.6px,2.75vw,11px)!important;
+    line-height:1.68!important;
+    letter-spacing:0!important;
+  }
+  #cover .cover-deck-line{display:block!important;white-space:nowrap!important}
+  #cover .cover-brandrow{gap:14px!important}
+  #cover .cover-brand{min-width:0!important}
+  #cover .cover-brand b,#cover .cover-brand span{white-space:nowrap!important}
+  #cover .cover-brandwords{flex:0 0 auto!important;text-align:right!important}
+  #cover .cover-stage-main h2{white-space:normal!important}
+}
+@media(max-width:360px){
+  #cover .cover-editorial-copy.cover-description-only .cover-deck{font-size:9px!important}
+  #cover .cover-copy{padding-left:15px!important;padding-right:15px!important}
+}
+</style>
+
+<style id="v252-audit-fixes">
+/* v252 — site-wide audit fixes: single ENTER, lighter cover paint, corrected light UI metadata */
+html{background:#e7e2d7!important}
+body.cover-open::before{display:none!important}
+#cover{transition:none!important}
+#cover .cover-actions{grid-template-columns:1fr!important}
+#cover .cover-enter{width:100%!important}
+#cover .cover-art{filter:none!important}
+@media(max-width:980px){#cover .cover-actions{grid-template-columns:1fr!important}}
+@media(max-width:830px){#cover .cover-actions{grid-template-columns:1fr!important}}
+@media(max-width:560px){#cover .cover-actions{grid-template-columns:1fr!important}}
 </style>
 </body></html>

@@ -1415,7 +1415,7 @@ window.M1KOC_RUNTIME_FIX={version:'v238',fix:'shared agencyCanonical for v219+ a
       groups.innerHTML=inHtml+outHtml+moveHtml;changes.hidden=false;
     }else{groups.innerHTML='';changes.hidden=true;}
     document.getElementById('forecastTable').innerHTML=`<table class="discoverlist"><thead><tr><th>#</th><th>ユニット</th><th>FORECAST</th><th>実績</th><th>新星</th><th>累積POWER</th><th>決勝</th><th>SF+</th><th>MOMENTUM</th></tr></thead><tbody>${rows.slice(0,30).map((x,i)=>{const old=prevMap.get(x.name),delta=old?old-(i+1):null;return`<tr class="${i<10?'forecast-row-finalist':i<20?'forecast-row-border':''}" data-name="${esc(x.name)}"><td>${i+1}${prev&&delta?` <span class="forecastdelta ${delta>0?'up':'down'}">${delta>0?'↑'+delta:'↓'+Math.abs(delta)}</span>`:''}</td><td><strong>${esc(x.name)}</strong></td><td><span class="metricpill ${i<10?'hot':''}">${x.score.toFixed(1)}</span></td><td>${x.safe.toFixed(1)}</td><td>${x.rising.toFixed(1)}</td><td>${x.total}</td><td>${x.finals}</td><td>${x.sfs}</td><td>${x.momentum>=0?'+':''}${x.momentum.toFixed(2)}</td></tr>`}).join('')}</tbody></table>`;wireNames(document.getElementById('forecastTable'));
-    document.getElementById('forecastNote').innerHTML=`※ ${c==='m1'?'M-1':'KOC'} 2026を、<b>2025年まで</b>のDB戦績だけでシミュレーション。2026年の既知結果は計算から除外しています。<b>${c==='m1'?'M-1':'KOC'}歴代優勝者は候補から除外</b>しています。FORECAST INDEXは確率ではなく比較用の相対指数です。${c==='m1'?'M-1はDB上の結成年が2011年以前の組も候補から除外。':''} スライダー操作時のIN / OUTは、10位↔11位の決勝ボーダーをまたいだ変化を示します。BORDER GAPは10位と11位のFORECAST INDEX差で、0に近いほど予想が割れやすい状態です。`;
+    document.getElementById('forecastNote').innerHTML=`※ ${c==='m1'?'M-1':'KOC'} 2026を、<b>2025年まで</b>のDB戦績だけでシミュレーション。2026年の既知結果は計算から除外しています。<b>${c==='m1'?'M-1':'KOC'}歴代優勝者は候補から除外</b>しています。FORECAST INDEXは確率ではなく比較用の相対指数です。${c==='m1'?'M-1はDB上の結成年が2010年以前の組を候補から除外。':''} スライダー操作時のIN / OUTは、10位↔11位の決勝ボーダーをまたいだ変化を示します。BORDER GAPは10位と11位のFORECAST INDEX差で、0に近いほど予想が割れやすい状態です。`;
     forecastPrev[c]={topNames:currentTop,rankMap:currentMap,star};
     renderBacktest();
   }
@@ -2048,3 +2048,10 @@ window.M1KOC_CHECKPOINT={...(window.M1KOC_CHECKPOINT||{}),version:'v248',focus:'
   setMode('finder');renderYears();
   window.M1KOC_LAST_YEAR={setYear:y=>{if(YEARS.includes(+y)){state.year=+y;setMode('lastyear');render()}},version:'v249'};
 })();
+
+/* v251: approved cover copy lock + typography cleanup. */
+window.M1KOC_CHECKPOINT={...(window.M1KOC_CHECKPOINT||{}),version:'v251',focus:'approved cover copy lock + door/top typography cleanup',checked_at:'2026-09-15'};
+
+
+/* v252: full static audit + cover ENTER-only release marker. */
+window.M1KOC_CHECKPOINT={...(window.M1KOC_CHECKPOINT||{}),version:'v252',focus:'full static audit + single ENTER cover + cover paint reduction',checked_at:'2026-09-15'};

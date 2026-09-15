@@ -1,0 +1,18 @@
+{
+  "duplicate_ids": {},
+  "broken_hash_refs": [],
+  "broken_aria_refs": [],
+  "missing_local_assets": [],
+  "css_parse_errors": [],
+  "empty_unlabelled_buttons": [],
+  "target_blank_without_safe_rel": [],
+  "preloads": [],
+  "cover_enter_count": 1,
+  "cover_skip_count": 0,
+  "visible_SKIP_literal_count": 0,
+  "approved_main_copy": true,
+  "approved_deck": true,
+  "dialog_named": true,
+  "theme_color": "#f7f4ec",
+  "color_scheme": "light"
+}

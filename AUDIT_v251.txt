@@ -1,0 +1,14 @@
+M-1 × KOC DATABASE v251 AUDIT
+Date: 2026-09-15
+
+PASS: core.js syntax
+PASS: patches.js syntax
+PASS: HTML parses
+PASS: duplicate HTML IDs = 0
+PASS: cover left column has no duplicate catch headline
+PASS: photo side main copy is fixed to 「面白いを、可視化する。」
+PASS: approved description is fixed to 2 semantic lines
+PASS: unapproved v250 「笑いの軌跡から、次の主役を探す。」 removed
+PASS: internal hero copy aligned with approved wording
+PASS: mobile semantic-line nowrap rules retained for door/top hero
+PASS: ENTER / SKIP IDs and existing v247 gate structure retained

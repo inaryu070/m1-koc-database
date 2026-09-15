@@ -1,0 +1,12 @@
+M-1 × KOC v250 AUDIT
+
+PASS  old cover copy removed
+PASS  new cover copy present
+PASS  controlled cover headline lines
+PASS  controlled deck lines
+PASS  duplicate HTML ids = 0
+PASS  db.js present
+PASS  core.js present
+PASS  patches.js present
+PASS  core.js syntax
+PASS  patches.js syntax
