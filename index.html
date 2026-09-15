@@ -331,6 +331,19 @@ button,select,input{touch-action:manipulation}
   <div class="edstat"><b id="edChamp">—</b><span>CHAMPIONS</span></div>
   <div class="edstat-copy">お笑いのすべてを、<br>データから。<span>→</span></div>
 </section>
+<div class="primarytabs prioritytabs" id="primaryTabs" role="tablist" aria-label="優先表示コンテンツ">
+  <button class="primarytab prioritytab on" id="priorityTabTotal" type="button" role="tab" aria-selected="true" data-priority-target="total"><span><strong>TOTAL POWER</strong><span>総合ポイント</span></span><i>01</i></button>
+  <button class="primarytab prioritytab" id="priorityTabNextstar" type="button" role="tab" aria-selected="false" data-priority-target="nextstar"><span><strong>NEXT STAR</strong><span>次に来るコンビ</span></span><i>02</i></button>
+  <button class="primarytab prioritytab" id="priorityTabAgency" type="button" role="tab" aria-selected="false" data-priority-target="agency"><span><strong>AGENCY</strong><span>事務所関連</span></span><i>03</i></button>
+  <button class="primarytab prioritytab" id="priorityTabForecast" type="button" role="tab" aria-selected="false" data-priority-target="forecast"><span><strong>FORECAST</strong><span>決勝予測</span></span><i>04</i></button>
+</div>
+<section class="priorityintro" id="priorityIntro" aria-live="polite">
+  <span id="priorityKicker">RANKING / ALL RECORDS</span>
+  <h2 id="priorityTitle">総合ポイント</h2>
+  <p id="priorityDescription">M-1・KOC本体点と収録済み外部賞レース加点を合算した、全ユニットの総合ランキング。</p>
+</section>
+
+
 <section class="edfeature" id="edFeature">
   <div class="edfeature-copy">
     <span class="edkicker">FEATURE</span>
@@ -366,18 +379,6 @@ button,select,input{touch-action:manipulation}
     <div class="edpickup-banner"><span>まだ見ぬ、<br>おもしろいを見つけよう。</span></div>
     <div class="edpickups" id="homePickups"></div>
   </article>
-</section>
-
-<div class="primarytabs prioritytabs" id="primaryTabs" role="tablist" aria-label="優先表示コンテンツ">
-  <button class="primarytab prioritytab on" id="priorityTabTotal" type="button" role="tab" aria-selected="true" data-priority-target="total"><span><strong>TOTAL POWER</strong><span>総合ポイント</span></span><i>01</i></button>
-  <button class="primarytab prioritytab" id="priorityTabNextstar" type="button" role="tab" aria-selected="false" data-priority-target="nextstar"><span><strong>NEXT STAR</strong><span>次に来るコンビ</span></span><i>02</i></button>
-  <button class="primarytab prioritytab" id="priorityTabAgency" type="button" role="tab" aria-selected="false" data-priority-target="agency"><span><strong>AGENCY</strong><span>事務所関連</span></span><i>03</i></button>
-  <button class="primarytab prioritytab" id="priorityTabForecast" type="button" role="tab" aria-selected="false" data-priority-target="forecast"><span><strong>FORECAST</strong><span>決勝予測</span></span><i>04</i></button>
-</div>
-<section class="priorityintro" id="priorityIntro" aria-live="polite">
-  <span id="priorityKicker">RANKING / ALL RECORDS</span>
-  <h2 id="priorityTitle">総合ポイント</h2>
-  <p id="priorityDescription">M-1・KOC本体点と収録済み外部賞レース加点を合算した、全ユニットの総合ランキング。</p>
 </section>
 
 <section class="totalpowerpage" id="totalPowerPage" aria-label="総合ポイントランキング">
@@ -950,4 +951,149 @@ body.home-index.priority-about #about{display:block!important}
 .ref-mobile-menu [data-priority-nav].active{color:#d94a45}
 .ref-mobile-menu [data-priority-nav].active span{color:#d94a45}
 </style>
-\n<style>\n/* v235 TOTAL POWER editorial page */\n.home-index #totalPowerPage{display:none}.home-index.priority-total #totalPowerPage{display:grid!important;grid-template-columns:minmax(0,1.55fr) minmax(300px,.75fr);grid-template-areas:"controls controls" "top top" "land comp" "tiers tiers" "rank rank";column-gap:30px;row-gap:0;color:#151515;padding:0 0 38px}\n.home-index.priority-total #search,.home-index.priority-total .sectionlabel,.home-index.priority-total .stats,.home-index.priority-total #grid,.home-index.priority-total #comparebar{display:none!important}.home-index.priority-total.total-detail-open #search{display:block!important}.home-index.priority-total.total-detail-open .sectionlabel{display:flex!important}.home-index.priority-total.total-detail-open .stats{display:grid!important}.home-index.priority-total.total-detail-open #grid{display:grid!important}.home-index.priority-total.total-detail-open #comparebar.show{display:flex!important}\n.tp-controls{grid-area:controls;display:flex;align-items:flex-end;gap:28px;padding:14px 0 18px;border-bottom:1px solid var(--rule)}.tp-controlgroup>span{display:block;margin:0 0 6px;color:#77736c;font-size:7px;letter-spacing:.17em}.tp-segments{display:flex;border:1px solid #c9c3b7}.tp-segments button{min-width:64px;height:31px;border:0;border-right:1px solid #c9c3b7;background:transparent;color:#5c5851;font:inherit;font-size:9px;letter-spacing:.08em;cursor:pointer}.tp-segments button:last-child{border-right:0}.tp-segments button.on{background:#191919;color:#fff}.tp-detail-toggle{margin-left:auto;height:32px;padding:0 2px;border:0;border-bottom:1px solid #7f7a72;background:transparent;color:#3e3a35;font:inherit;font-size:8px;letter-spacing:.11em;cursor:pointer}\n.tp-top10{grid-area:top;padding:28px 0 30px;border-bottom:1px solid var(--rule)}.tp-sectionhead{display:flex;align-items:flex-end;justify-content:space-between;gap:18px;margin:0 0 16px}.tp-sectionhead>div>span{display:block;color:#77736c;font-size:7px;letter-spacing:.18em}.tp-sectionhead h3{margin:5px 0 0;font-family:Georgia,'Yu Mincho','Hiragino Mincho ProN',serif;font-weight:500;font-size:34px;line-height:1;color:#111}.tp-sectionhead p{margin:0;color:#77736c;font-family:'Yu Mincho','Hiragino Mincho ProN',serif;font-size:9px}.tp-sectionhead.compact h3{font-size:24px}.tp-toplist{display:grid}.tp-toprow{display:grid;grid-template-columns:42px minmax(170px,.9fr) minmax(280px,2fr) 70px;gap:14px;align-items:center;min-height:58px;border-top:1px solid #ddd8cd;cursor:pointer}.tp-toprow:last-child{border-bottom:1px solid #ddd8cd}.tp-rank{font-family:Georgia,serif;font-size:18px;color:#6d6962}.tp-team b{display:block;font-family:'Yu Mincho','Hiragino Mincho ProN',serif;font-size:16px;font-weight:600;color:#111}.tp-team small{display:block;margin-top:3px;color:#858078;font-size:8px;letter-spacing:.03em}.tp-stack{height:10px;display:flex;background:#e4e0d7;overflow:hidden}.tp-stack i{display:block;height:100%}.tp-stack .m1{background:var(--m1r)}.tp-stack .koc{background:var(--kocb)}.tp-stack .bonus{background:var(--gold)}.tp-stacklabel{display:flex;gap:12px;margin-top:5px;color:#77736c;font-size:7px}.tp-stacklabel .m1{color:#ad3936}.tp-stacklabel .koc{color:#3f6e9f}.tp-stacklabel .bonus{color:#9b7419}.tp-score{text-align:right}.tp-score b{display:block;font-family:Georgia,serif;font-size:22px;font-weight:500;color:#111}.tp-score span{display:block;color:#88837b;font-size:7px;letter-spacing:.12em}.tp-toprow:hover .tp-team b{text-decoration:underline;text-underline-offset:3px}\n.tp-composition{grid-area:comp;padding:24px 0 26px;border-bottom:1px solid var(--rule)}.tp-comp-list{display:grid;gap:9px}.tp-comprow{display:grid;grid-template-columns:minmax(90px,1fr) 1.4fr 36px;gap:8px;align-items:center;cursor:pointer}.tp-comprow b{font-family:'Yu Mincho','Hiragino Mincho ProN',serif;font-size:9px;color:#222;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.tp-compbar{height:8px;display:flex;background:#e4e0d7}.tp-compbar i{height:100%}.tp-compbar .m1{background:var(--m1r)}.tp-compbar .koc{background:var(--kocb)}.tp-compbar .bonus{background:var(--gold)}.tp-comprow em{font-style:normal;text-align:right;font-size:8px;color:#666}\n.tp-landscape{grid-area:land;padding:24px 0 26px;border-right:1px solid var(--rule);padding-right:28px;border-bottom:1px solid var(--rule)}.tp-canvaswrap{position:relative}.tp-canvaswrap canvas{display:block;width:100%;height:365px}.tp-tip{display:none;position:absolute;z-index:5;pointer-events:none;padding:8px 10px;background:#191919;color:#f5f3ed;border:1px solid #333;font-size:8px;line-height:1.55}.tp-tip.show{display:block}\n.tp-tiers{grid-area:tiers;padding:24px 0 26px;border-bottom:1px solid var(--rule)}.tp-tiergrid{display:grid;grid-template-columns:repeat(5,1fr);border-top:1px solid #d9d4c9;border-bottom:1px solid #d9d4c9}.tp-tier{padding:15px 14px;border-right:1px solid #d9d4c9}.tp-tier:last-child{border-right:0}.tp-tier span{display:block;color:#77736c;font-size:8px;letter-spacing:.1em}.tp-tier b{display:block;margin-top:6px;font-family:Georgia,serif;font-size:28px;font-weight:500;color:#111}.tp-tier small{display:block;margin-top:4px;color:#8c877f;font-size:7px}\n.tp-ranking{grid-area:rank;padding:28px 0 0}.tp-rankingtools{display:flex;align-items:center;gap:14px}.tp-rankingtools input{width:200px;height:32px;border:0;border-bottom:1px solid #aaa49a;border-radius:0;background:transparent;color:#111;font:inherit;font-size:11px}.tp-rankingtools span{color:#817c74;font-size:8px}.tp-tablewrap{overflow:auto;border-top:1px solid #cfc9bd}.tp-table{width:100%;border-collapse:collapse;min-width:690px}.tp-table th,.tp-table td{padding:10px 8px;border-bottom:1px solid #ddd8cd;text-align:right;font-size:9px;color:#2b2926;font-variant-numeric:tabular-nums}.tp-table th{color:#77736c;font-weight:500;font-size:7px;letter-spacing:.09em}.tp-table th:first-child,.tp-table td:first-child{text-align:left;width:46px}.tp-table th:nth-child(2),.tp-table td:nth-child(2){text-align:left}.tp-table td:nth-child(2){font-family:'Yu Mincho','Hiragino Mincho ProN',serif;font-size:11px;font-weight:600;cursor:pointer}.tp-table tr:hover td{background:rgba(0,0,0,.025)}.tp-table .mainpt{font-family:Georgia,serif;font-size:12px}.tp-table .m1pt{color:#a63f3b}.tp-table .kocpt{color:#416d99}.tp-table .bonuspt{color:#99731b}.tp-more{display:block;margin:18px auto 0;padding:8px 18px;border:0;border-bottom:1px solid #777;background:transparent;color:#333;font:inherit;font-size:9px;letter-spacing:.12em;cursor:pointer}\n@media(max-width:900px){.home-index.priority-total #totalPowerPage{grid-template-columns:1fr;grid-template-areas:"controls" "top" "comp" "rank" "land" "tiers"}.tp-landscape{border-right:0;padding-right:0}.tp-toprow{grid-template-columns:38px minmax(140px,.8fr) minmax(220px,1.7fr) 62px}.tp-tiergrid{grid-template-columns:repeat(5,1fr)}}\n@media(max-width:600px){.tp-controls{gap:12px;flex-wrap:wrap;padding:10px 0 14px}.tp-controlgroup{flex:1 1 145px}.tp-segments{width:100%}.tp-segments button{flex:1;min-width:0}.tp-detail-toggle{margin-left:0}.tp-sectionhead{align-items:flex-start;flex-direction:column;gap:6px}.tp-sectionhead h3{font-size:29px}.tp-sectionhead.compact h3{font-size:22px}.tp-toprow{grid-template-columns:30px minmax(0,1fr) 52px;gap:9px;padding:11px 0;min-height:0}.tp-toprow .tp-stackwrap{grid-column:2/4;grid-row:2}.tp-team b{font-size:15px}.tp-score b{font-size:19px}.tp-stacklabel{gap:8px}.tp-comp-list{gap:11px}.tp-comprow{grid-template-columns:100px 1fr 32px}.tp-canvaswrap canvas{height:300px}.tp-tiergrid{grid-template-columns:repeat(2,1fr)}.tp-tier:nth-child(2n){border-right:0}.tp-tier:last-child{grid-column:1/-1;border-top:1px solid #d9d4c9}.tp-rankingtools{width:100%;justify-content:space-between}.tp-rankingtools input{width:min(190px,60vw)}}\n</style>\n</body></html>
+
+<style>
+/* v235 TOTAL POWER editorial page */
+.home-index #totalPowerPage{display:none}.home-index.priority-total #totalPowerPage{display:grid!important;grid-template-columns:minmax(0,1.55fr) minmax(300px,.75fr);grid-template-areas:"controls controls" "top top" "land comp" "tiers tiers" "rank rank";column-gap:30px;row-gap:0;color:#151515;padding:0 0 38px}
+.home-index.priority-total #search,.home-index.priority-total .sectionlabel,.home-index.priority-total .stats,.home-index.priority-total #grid,.home-index.priority-total #comparebar{display:none!important}.home-index.priority-total.total-detail-open #search{display:block!important}.home-index.priority-total.total-detail-open .sectionlabel{display:flex!important}.home-index.priority-total.total-detail-open .stats{display:grid!important}.home-index.priority-total.total-detail-open #grid{display:grid!important}.home-index.priority-total.total-detail-open #comparebar.show{display:flex!important}
+.tp-controls{grid-area:controls;display:flex;align-items:flex-end;gap:28px;padding:14px 0 18px;border-bottom:1px solid var(--rule)}.tp-controlgroup>span{display:block;margin:0 0 6px;color:#77736c;font-size:7px;letter-spacing:.17em}.tp-segments{display:flex;border:1px solid #c9c3b7}.tp-segments button{min-width:64px;height:31px;border:0;border-right:1px solid #c9c3b7;background:transparent;color:#5c5851;font:inherit;font-size:9px;letter-spacing:.08em;cursor:pointer}.tp-segments button:last-child{border-right:0}.tp-segments button.on{background:#191919;color:#fff}.tp-detail-toggle{margin-left:auto;height:32px;padding:0 2px;border:0;border-bottom:1px solid #7f7a72;background:transparent;color:#3e3a35;font:inherit;font-size:8px;letter-spacing:.11em;cursor:pointer}
+.tp-top10{grid-area:top;padding:28px 0 30px;border-bottom:1px solid var(--rule)}.tp-sectionhead{display:flex;align-items:flex-end;justify-content:space-between;gap:18px;margin:0 0 16px}.tp-sectionhead>div>span{display:block;color:#77736c;font-size:7px;letter-spacing:.18em}.tp-sectionhead h3{margin:5px 0 0;font-family:Georgia,'Yu Mincho','Hiragino Mincho ProN',serif;font-weight:500;font-size:34px;line-height:1;color:#111}.tp-sectionhead p{margin:0;color:#77736c;font-family:'Yu Mincho','Hiragino Mincho ProN',serif;font-size:9px}.tp-sectionhead.compact h3{font-size:24px}.tp-toplist{display:grid}.tp-toprow{display:grid;grid-template-columns:42px minmax(170px,.9fr) minmax(280px,2fr) 70px;gap:14px;align-items:center;min-height:58px;border-top:1px solid #ddd8cd;cursor:pointer}.tp-toprow:last-child{border-bottom:1px solid #ddd8cd}.tp-rank{font-family:Georgia,serif;font-size:18px;color:#6d6962}.tp-team b{display:block;font-family:'Yu Mincho','Hiragino Mincho ProN',serif;font-size:16px;font-weight:600;color:#111}.tp-team small{display:block;margin-top:3px;color:#858078;font-size:8px;letter-spacing:.03em}.tp-stack{height:10px;display:flex;background:#e4e0d7;overflow:hidden}.tp-stack i{display:block;height:100%}.tp-stack .m1{background:var(--m1r)}.tp-stack .koc{background:var(--kocb)}.tp-stack .bonus{background:var(--gold)}.tp-stacklabel{display:flex;gap:12px;margin-top:5px;color:#77736c;font-size:7px}.tp-stacklabel .m1{color:#ad3936}.tp-stacklabel .koc{color:#3f6e9f}.tp-stacklabel .bonus{color:#9b7419}.tp-score{text-align:right}.tp-score b{display:block;font-family:Georgia,serif;font-size:22px;font-weight:500;color:#111}.tp-score span{display:block;color:#88837b;font-size:7px;letter-spacing:.12em}.tp-toprow:hover .tp-team b{text-decoration:underline;text-underline-offset:3px}
+.tp-composition{grid-area:comp;padding:24px 0 26px;border-bottom:1px solid var(--rule)}.tp-comp-list{display:grid;gap:9px}.tp-comprow{display:grid;grid-template-columns:minmax(90px,1fr) 1.4fr 36px;gap:8px;align-items:center;cursor:pointer}.tp-comprow b{font-family:'Yu Mincho','Hiragino Mincho ProN',serif;font-size:9px;color:#222;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.tp-compbar{height:8px;display:flex;background:#e4e0d7}.tp-compbar i{height:100%}.tp-compbar .m1{background:var(--m1r)}.tp-compbar .koc{background:var(--kocb)}.tp-compbar .bonus{background:var(--gold)}.tp-comprow em{font-style:normal;text-align:right;font-size:8px;color:#666}
+.tp-landscape{grid-area:land;padding:24px 0 26px;border-right:1px solid var(--rule);padding-right:28px;border-bottom:1px solid var(--rule)}.tp-canvaswrap{position:relative}.tp-canvaswrap canvas{display:block;width:100%;height:365px}.tp-tip{display:none;position:absolute;z-index:5;pointer-events:none;padding:8px 10px;background:#191919;color:#f5f3ed;border:1px solid #333;font-size:8px;line-height:1.55}.tp-tip.show{display:block}
+.tp-tiers{grid-area:tiers;padding:24px 0 26px;border-bottom:1px solid var(--rule)}.tp-tiergrid{display:grid;grid-template-columns:repeat(5,1fr);border-top:1px solid #d9d4c9;border-bottom:1px solid #d9d4c9}.tp-tier{padding:15px 14px;border-right:1px solid #d9d4c9}.tp-tier:last-child{border-right:0}.tp-tier span{display:block;color:#77736c;font-size:8px;letter-spacing:.1em}.tp-tier b{display:block;margin-top:6px;font-family:Georgia,serif;font-size:28px;font-weight:500;color:#111}.tp-tier small{display:block;margin-top:4px;color:#8c877f;font-size:7px}
+.tp-ranking{grid-area:rank;padding:28px 0 0}.tp-rankingtools{display:flex;align-items:center;gap:14px}.tp-rankingtools input{width:200px;height:32px;border:0;border-bottom:1px solid #aaa49a;border-radius:0;background:transparent;color:#111;font:inherit;font-size:11px}.tp-rankingtools span{color:#817c74;font-size:8px}.tp-tablewrap{overflow:auto;border-top:1px solid #cfc9bd}.tp-table{width:100%;border-collapse:collapse;min-width:690px}.tp-table th,.tp-table td{padding:10px 8px;border-bottom:1px solid #ddd8cd;text-align:right;font-size:9px;color:#2b2926;font-variant-numeric:tabular-nums}.tp-table th{color:#77736c;font-weight:500;font-size:7px;letter-spacing:.09em}.tp-table th:first-child,.tp-table td:first-child{text-align:left;width:46px}.tp-table th:nth-child(2),.tp-table td:nth-child(2){text-align:left}.tp-table td:nth-child(2){font-family:'Yu Mincho','Hiragino Mincho ProN',serif;font-size:11px;font-weight:600;cursor:pointer}.tp-table tr:hover td{background:rgba(0,0,0,.025)}.tp-table .mainpt{font-family:Georgia,serif;font-size:12px}.tp-table .m1pt{color:#a63f3b}.tp-table .kocpt{color:#416d99}.tp-table .bonuspt{color:#99731b}.tp-more{display:block;margin:18px auto 0;padding:8px 18px;border:0;border-bottom:1px solid #777;background:transparent;color:#333;font:inherit;font-size:9px;letter-spacing:.12em;cursor:pointer}
+@media(max-width:900px){.home-index.priority-total #totalPowerPage{grid-template-columns:1fr;grid-template-areas:"controls" "top" "comp" "rank" "land" "tiers"}.tp-landscape{border-right:0;padding-right:0}.tp-toprow{grid-template-columns:38px minmax(140px,.8fr) minmax(220px,1.7fr) 62px}.tp-tiergrid{grid-template-columns:repeat(5,1fr)}}
+@media(max-width:600px){.tp-controls{gap:12px;flex-wrap:wrap;padding:10px 0 14px}.tp-controlgroup{flex:1 1 145px}.tp-segments{width:100%}.tp-segments button{flex:1;min-width:0}.tp-detail-toggle{margin-left:0}.tp-sectionhead{align-items:flex-start;flex-direction:column;gap:6px}.tp-sectionhead h3{font-size:29px}.tp-sectionhead.compact h3{font-size:22px}.tp-toprow{grid-template-columns:30px minmax(0,1fr) 52px;gap:9px;padding:11px 0;min-height:0}.tp-toprow .tp-stackwrap{grid-column:2/4;grid-row:2}.tp-team b{font-size:15px}.tp-score b{font-size:19px}.tp-stacklabel{gap:8px}.tp-comp-list{gap:11px}.tp-comprow{grid-template-columns:100px 1fr 32px}.tp-canvaswrap canvas{height:300px}.tp-tiergrid{grid-template-columns:repeat(2,1fr)}.tp-tier:nth-child(2n){border-right:0}.tp-tier:last-child{grid-column:1/-1;border-top:1px solid #d9d4c9}.tp-rankingtools{width:100%;justify-content:space-between}.tp-rankingtools input{width:min(190px,60vw)}}
+</style>
+
+<style>
+/* v236 mobile repair + true priority-tab panels */
+html,body{width:100%;max-width:100%;overflow-x:hidden}
+body.home-index{background:#f4f1e8!important;color:#181715!important}
+.home-index .wrap{width:auto!important;max-width:none!important;min-width:0!important}
+.home-index main,.home-index section,.home-index article,.home-index div{min-width:0}
+/* The editorial digest now belongs to its relevant tabs, never always-on. */
+.home-index #edFeature,.home-index #edLower{display:none!important}
+.home-index.priority-agency #edFeature{display:grid!important}
+.home-index.priority-forecast #edLower{display:grid!important}
+/* Do not surface internal audit controls in the main experience. */
+body:not(.priority-about) #dqAuditBtn,body:not(.priority-about) #dqAuditPanel{display:none!important}
+/* Keep only the selected priority page visible. */
+.home-index #totalPowerPage,
+.home-index .nextstar.nextstar-v2,
+.home-index .featurebar,
+.home-index #search,
+.home-index .sectionlabel,
+.home-index .stats,
+.home-index #grid,
+.home-index #comparebar,
+.home-index #agencyTabs,
+.home-index #agencyDashboard,
+.home-index #agencyEvolution,
+.home-index #agencyTournament,
+.home-index #agencyInsights,
+.home-index #agencyVisuals,
+.home-index #discoveryRoot,
+.home-index #about,
+.home-index #analytics{display:none!important}
+.home-index.priority-total #totalPowerPage{display:grid!important}
+.home-index.priority-total.total-detail-open #search{display:block!important}
+.home-index.priority-total.total-detail-open .sectionlabel{display:flex!important}
+.home-index.priority-total.total-detail-open .stats{display:grid!important}
+.home-index.priority-total.total-detail-open #grid{display:grid!important}
+.home-index.priority-total.total-detail-open #comparebar.show{display:flex!important}
+.home-index.priority-nextstar .nextstar.nextstar-v2{display:grid!important}
+.home-index.priority-nextstar .featurebar{display:flex!important}
+.home-index.priority-nextstar #grid{display:grid!important}
+.home-index.priority-nextstar #comparebar.show{display:flex!important}
+.home-index.priority-nextstar #search.nextstar-detail-open{display:block!important}
+.home-index.priority-agency #agencyTabs{display:flex!important}
+.home-index.priority-agency #agencyDashboard:not([hidden]),
+.home-index.priority-agency #agencyEvolution:not([hidden]),
+.home-index.priority-agency #agencyTournament:not([hidden]),
+.home-index.priority-agency #agencyInsights:not([hidden]),
+.home-index.priority-agency #agencyVisuals:not([hidden]){display:block!important}
+.home-index.priority-forecast #discoveryRoot{display:block!important}
+.home-index.priority-about #about{display:block!important}
+/* tabs sit directly below the universal data strip */
+.home-index #primaryTabs.prioritytabs{margin:0!important;border-top:0!important}
+.home-index .priorityintro{margin:0!important}
+/* avoid stale home preview loading placeholders */
+.home-index.priority-total .edfeature,.home-index.priority-total .edlower,
+.home-index.priority-nextstar .edfeature,.home-index.priority-nextstar .edlower{display:none!important}
+/* NEXT STAR gets its own optional detail control; no full DB controls until requested */
+.nextstar-detail-toggle{display:inline-flex;margin:12px 0 0;border:0;border-bottom:1px solid #817c73;background:transparent;color:#333;padding:6px 0;font:inherit;font-size:8px;letter-spacing:.12em;cursor:pointer}
+/* mobile: one clean editorial column, no grid-area collisions */
+@media(max-width:760px){
+  body.home-index{width:100vw!important;overflow-x:hidden!important}
+  .ref-mobile-head{width:100%;max-width:100vw}
+  .home-index .wrap{width:100%!important;max-width:100%!important;margin:0!important;padding:0 14px 26px!important;overflow:visible!important}
+  .home-index .hero{width:auto!important;max-width:none!important;margin-left:-14px!important;margin-right:-14px!important}
+  .home-index .edstats{width:100%;overflow:hidden}
+  .home-index #primaryTabs.prioritytabs{position:sticky!important;top:70px!important;z-index:55!important;width:calc(100% + 28px)!important;margin-left:-14px!important;margin-right:-14px!important;display:grid!important;grid-template-columns:repeat(4,minmax(0,1fr))!important;overflow:visible!important;background:#f4f1e8!important}
+  .home-index .prioritytab{min-width:0!important;width:auto!important;padding:12px 5px!important;justify-content:center!important;text-align:center!important}
+  .home-index .prioritytab strong{font-size:7.5px!important;white-space:nowrap}
+  .home-index .prioritytab span span,.home-index .prioritytab i{display:none!important}
+  .home-index .priorityintro{padding:18px 2px 16px!important}
+  .home-index .priorityintro h2{font-size:29px!important;line-height:1.15!important}
+  .home-index .priorityintro p{font-size:10px!important;line-height:1.75!important}
+  .home-index.priority-total #totalPowerPage{display:flex!important;flex-direction:column!important;width:100%!important;max-width:100%!important;padding:0 0 30px!important;gap:0!important}
+  #totalPowerPage>.tp-controls{order:1}
+  #totalPowerPage>.tp-top10{order:2}
+  #totalPowerPage>.tp-composition{order:3}
+  #totalPowerPage>.tp-ranking{order:4}
+  #totalPowerPage>.tp-landscape{order:5}
+  #totalPowerPage>.tp-tiers{order:6}
+  .tp-controls{display:grid!important;grid-template-columns:1fr 1fr!important;gap:12px!important;width:100%!important;padding:12px 0 15px!important}
+  .tp-controlgroup{min-width:0!important;width:100%!important}
+  .tp-segments{display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr))!important;width:100%!important}
+  .tp-segments button{min-width:0!important;width:100%!important;padding:0 5px!important}
+  .tp-detail-toggle{grid-column:1/-1!important;margin:0!important;justify-self:start!important}
+  .tp-top10,.tp-composition,.tp-landscape,.tp-tiers,.tp-ranking{width:100%!important;max-width:100%!important;min-width:0!important;padding-left:0!important;padding-right:0!important;border-right:0!important}
+  .tp-sectionhead{display:flex!important;flex-direction:column!important;align-items:flex-start!important;gap:5px!important;margin-bottom:12px!important}
+  .tp-sectionhead h3{font-size:27px!important;line-height:1.02!important;margin-top:4px!important}
+  .tp-sectionhead.compact h3{font-size:23px!important}
+  .tp-sectionhead p{font-size:8px!important;line-height:1.5!important;max-width:100%!important}
+  .tp-toprow{display:grid!important;grid-template-columns:28px minmax(0,1fr) 50px!important;gap:8px!important;width:100%!important;padding:11px 0!important;min-height:0!important}
+  .tp-toprow .tp-stackwrap{grid-column:2/4!important;grid-row:2!important;min-width:0!important;width:100%!important}
+  .tp-team{min-width:0!important}.tp-team b{font-size:14px!important;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.tp-team small{font-size:7px!important}
+  .tp-score b{font-size:18px!important}.tp-score span{font-size:6px!important}
+  .tp-stacklabel{display:flex!important;flex-wrap:wrap!important;gap:5px 8px!important;font-size:6.5px!important}
+  .tp-comprow{display:grid!important;grid-template-columns:88px minmax(0,1fr) 30px!important;gap:7px!important;width:100%!important}.tp-comprow b{font-size:8px!important}
+  .tp-rankingtools{display:flex!important;width:100%!important;gap:8px!important}.tp-rankingtools input{width:min(210px,70vw)!important;max-width:100%!important;min-width:0!important}
+  .tp-tablewrap{width:100%!important;max-width:100%!important;overflow-x:auto!important;-webkit-overflow-scrolling:touch!important}
+  .tp-table{min-width:620px!important;width:620px!important}
+  .tp-canvaswrap{width:100%!important;max-width:100%!important;overflow:hidden!important}.tp-canvaswrap canvas{display:block!important;width:100%!important;height:285px!important}
+  .tp-tiergrid{display:grid!important;grid-template-columns:1fr 1fr!important;width:100%!important}.tp-tier{min-width:0!important}.tp-tier:last-child{grid-column:1/-1!important}
+  .home-index.priority-nextstar .nextstar.nextstar-v2{grid-template-columns:1fr!important;width:100%!important;padding:16px 0!important}.home-index.priority-nextstar .finderrow{grid-template-columns:1fr 1fr!important}.home-index.priority-nextstar .finderlabel{grid-column:1/-1!important}.home-index.priority-nextstar .finderstatus,.home-index.priority-nextstar .youthnote{margin-left:0!important}
+  .home-index.priority-nextstar .featurebar{display:flex!important;overflow-x:auto!important;max-width:100%!important;scrollbar-width:none}.home-index.priority-nextstar .featurebar::-webkit-scrollbar{display:none}
+  .home-index.priority-agency #edFeature{display:block!important;width:100%!important}.home-index.priority-agency .edfeature-chart,.home-index.priority-agency .edfeature-rank{width:100%!important;max-width:100%!important}
+  .home-index.priority-agency #agencyTabs{position:sticky!important;top:117px!important;max-width:100%!important;overflow-x:auto!important;scrollbar-width:none}.home-index.priority-agency #agencyTabs::-webkit-scrollbar{display:none}
+  .home-index.priority-forecast #edLower{display:block!important;width:100%!important}.home-index.priority-forecast .edpanel{width:100%!important;padding:14px 0!important;border-right:0!important;border-bottom:1px solid var(--rule)!important}
+  .home-index.priority-forecast .discoverytabs{position:sticky!important;top:117px!important;max-width:100%!important;overflow-x:auto!important}
+  #dqAuditBtn{display:none!important}
+}
+@media(max-width:430px){
+  .home-index .hero h1{font-size:38px!important;line-height:1.02!important}
+  .home-index .hero{grid-template-columns:minmax(0,1fr) 118px!important;background-position:62% center!important}
+  .home-index .edstats{grid-template-columns:repeat(4,minmax(0,1fr))!important}
+  .home-index .edstat{padding:12px 5px!important}.home-index .edstat b{font-size:25px!important}.home-index .edstat span{font-size:5.5px!important;line-height:1.3!important}
+}
+</style>
+
+
+<style>
+/* v236 specificity repairs for older priority rules */
+body.home-index.priority-nextstar #search,
+body.home-index.priority-nextstar .sectionlabel,
+body.home-index.priority-nextstar .stats{display:none!important}
+body.home-index.priority-nextstar #search.nextstar-detail-open{display:block!important}
+body.home-index.priority-total #search{display:none!important}
+body.home-index.priority-total.total-detail-open #search{display:block!important}
+body.home-index.priority-total .sectionlabel,body.home-index.priority-total .stats,body.home-index.priority-total #grid,body.home-index.priority-total #comparebar{display:none!important}
+body.home-index.priority-total.total-detail-open .sectionlabel{display:flex!important}
+body.home-index.priority-total.total-detail-open .stats{display:grid!important}
+body.home-index.priority-total.total-detail-open #grid{display:grid!important}
+body.home-index.priority-total.total-detail-open #comparebar.show{display:flex!important}
+</style>
+</body></html>

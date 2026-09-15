@@ -1871,3 +1871,52 @@ window.M1KOC_CHECKPOINT={...(window.M1KOC_CHECKPOINT||{}),version:'v218',focus:'
   window.M1KOC_TOTAL_POWER={render,version:'v235',state};
   window.M1KOC_CHECKPOINT={...(window.M1KOC_CHECKPOINT||{}),version:'v235',focus:'TOTAL POWER editorial ranking + composition + landscape',checked_at:'2026-09-15'};
 })();
+
+/* v236 true tab panels + mobile recovery */
+(()=>{
+  const body=document.body;
+  const tabs=document.getElementById('primaryTabs');
+  if(!body||!tabs)return;
+  const after=fn=>requestAnimationFrame(()=>requestAnimationFrame(fn));
+  const hideHomeDigestFor=(name)=>{
+    const feature=document.getElementById('edFeature');
+    const lower=document.getElementById('edLower');
+    if(feature)feature.style.removeProperty('display');
+    if(lower)lower.style.removeProperty('display');
+    body.classList.toggle('v236-agency-digest',name==='agency');
+    body.classList.toggle('v236-forecast-digest',name==='forecast');
+  };
+  function ensureStats(){
+    try{
+      const has=o=>o&&Object.keys(o).length>0;
+      const champions=new Set();
+      for(const d of DB){for(const obj of [d.m1||{},d.koc||{}])for(const v of Object.values(obj))if(/優勝/.test(v))champions.add(d.name)}
+      const set=(id,val)=>{const el=document.getElementById(id);if(el)el.textContent=Number(val).toLocaleString('ja-JP')};
+      set('edTotal',DB.length);set('edM1',DB.filter(d=>has(d.m1)).length);set('edKoc',DB.filter(d=>has(d.koc)).length);set('edChamp',champions.size);
+    }catch(_e){}
+  }
+  function sync(name){
+    hideHomeDigestFor(name);
+    ensureStats();
+    if(name==='total')after(()=>window.M1KOC_TOTAL_POWER?.render?.());
+    if(name==='agency')after(()=>{window.M1KOC_HOME_EDITORIAL?.render?.();window.M1KOC_RENDER_AGENCY_EVOLUTION?.();try{window.dispatchEvent(new Event('resize'))}catch(_e){}});
+    if(name==='forecast')after(()=>{window.M1KOC_HOME_EDITORIAL?.render?.();const b=document.querySelector('[data-discovery-tab="forecast"]');if(b&&!b.classList.contains('on'))b.click();try{window.dispatchEvent(new Event('resize'))}catch(_e){}});
+  }
+  // Keep selected panel deterministic even if legacy listeners miss a tap.
+  document.addEventListener('click',e=>{
+    const btn=e.target.closest('[data-priority-target]');
+    if(!btn)return;
+    const name=btn.dataset.priorityTarget;
+    after(()=>sync(name));
+  },true);
+  // Mobile NEXT STAR: details stay hidden unless explicitly requested.
+  const next=document.querySelector('.nextstar.nextstar-v2');
+  if(next&&!document.getElementById('nextstarDetailToggle')){
+    const b=document.createElement('button');b.type='button';b.id='nextstarDetailToggle';b.className='nextstar-detail-toggle';b.textContent='DETAIL FILTER ↘';b.setAttribute('aria-expanded','false');
+    next.appendChild(b);
+    b.addEventListener('click',()=>{const search=document.getElementById('search');const on=search?.classList.toggle('nextstar-detail-open');b.textContent=on?'DETAIL FILTER ↑':'DETAIL FILTER ↘';b.setAttribute('aria-expanded',on?'true':'false');if(on)search?.scrollIntoView({behavior:'smooth',block:'start'})});
+  }
+  ensureStats();
+  after(()=>sync(window.M1KOC_PRIORITY_VIEW?.get?.()||'total'));
+  window.M1KOC_CHECKPOINT={...(window.M1KOC_CHECKPOINT||{}),version:'v236',focus:'true priority tabs + mobile layout recovery',checked_at:'2026-09-15'};
+})();
