@@ -1986,3 +1986,60 @@ window.M1KOC_CHECKPOINT={...(window.M1KOC_CHECKPOINT||{}),version:'v241',focus:'
   }
   window.M1KOC_CHECKPOINT={...(window.M1KOC_CHECKPOINT||{}),version:'v243',focus:'final cover design + update log only on cover',checked_at:'2026-09-15'};
 })();
+
+
+/* v244 — enforce cover/body state invariants and prevent blank black screen */
+(()=>{
+  const body=document.body;
+  const cover=document.getElementById('cover');
+  if(!body||!cover)return;
+  const enter=document.getElementById('coverEnter');
+  const skip=document.getElementById('coverSkip');
+  let syncing=false;
+  const hidden=()=>cover.classList.contains('is-hidden')||cover.getAttribute('aria-hidden')==='true';
+  const sync=()=>{
+    if(syncing)return;
+    syncing=true;
+    if(hidden()){
+      body.classList.remove('cover-open');
+      cover.setAttribute('aria-hidden','true');
+    }else{
+      body.classList.add('cover-open');
+      cover.setAttribute('aria-hidden','false');
+    }
+    syncing=false;
+  };
+  const closeNow=()=>{
+    cover.classList.add('is-hidden');
+    cover.setAttribute('aria-hidden','true');
+    body.classList.remove('cover-open');
+  };
+  const openNow=()=>{
+    cover.classList.remove('is-hidden');
+    cover.setAttribute('aria-hidden','false');
+    body.classList.add('cover-open');
+    window.scrollTo({top:0,behavior:'auto'});
+  };
+  // Capture these controls before older listeners so their final state is deterministic.
+  [enter,skip].forEach(btn=>btn&&btn.addEventListener('click',e=>{
+    e.preventDefault();
+    e.stopImmediatePropagation();
+    closeNow();
+  },true));
+  document.addEventListener('click',e=>{
+    const home=e.target.closest('[data-priority-home]');
+    if(home){
+      e.preventDefault();
+      e.stopImmediatePropagation();
+      openNow();
+    }
+  },true);
+  const observer=new MutationObserver(sync);
+  observer.observe(cover,{attributes:true,attributeFilter:['class','aria-hidden']});
+  window.addEventListener('pageshow',sync);
+  window.addEventListener('popstate',()=>requestAnimationFrame(sync));
+  document.addEventListener('visibilitychange',()=>{if(!document.hidden)sync()});
+  requestAnimationFrame(sync);
+  window.M1KOC_COVER_STATE={open:openNow,close:closeNow,sync,version:'v244'};
+  window.M1KOC_CHECKPOINT={...(window.M1KOC_CHECKPOINT||{}),version:'v244',focus:'photo hero contrast + black-screen cover invariant',checked_at:'2026-09-15'};
+})();

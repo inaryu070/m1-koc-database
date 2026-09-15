@@ -1504,4 +1504,39 @@ body.cover-open .ref-sidebar,body.cover-open .ref-mobile-head,body.cover-open .r
   .cover-stage-main{margin-bottom:4vh}.cover-stage-main h2{font-size:39px}.cover-stage-main p{font-size:11px}
 }
 </style>
+
+<style>
+/* v244 — hero contrast + cover state hardening */
+/* The editorial global heading rule must never recolor text that sits on photography. */
+body.editorial-ui.home-index:not(.cover-open) .hero{
+  background-image:linear-gradient(90deg,rgba(7,7,8,.88) 0%,rgba(8,8,9,.72) 42%,rgba(8,8,9,.36) 68%,rgba(8,8,9,.48) 100%),url('hero-mic.jpg')!important;
+  color:#fff!important;
+}
+body.editorial-ui.home-index:not(.cover-open) .hero :is(h1,h2,h3,h4,h5,h6,strong,b){color:#fff!important}
+body.editorial-ui.home-index:not(.cover-open) .hero .lead{color:rgba(255,255,255,.88)!important;text-shadow:0 2px 18px rgba(0,0,0,.72)!important}
+body.editorial-ui.home-index:not(.cover-open) .hero h1{color:#fff!important;text-shadow:0 3px 24px rgba(0,0,0,.78)!important}
+body.editorial-ui.home-index:not(.cover-open) .heroaside,
+body.editorial-ui.home-index:not(.cover-open) .heroaside :is(small,span,.hero-era,.hero-explore){color:rgba(255,255,255,.92)!important;text-shadow:0 2px 14px rgba(0,0,0,.72)!important}
+body.editorial-ui.home-index:not(.cover-open) .heroaside .hero-era{color:#fff!important}
+body.editorial-ui.home-index:not(.cover-open) .heroaside .hero-explore{color:#fff!important}
+
+/* If the cover is hidden, the application must remain visible even if a stale body class survived. */
+body:not(.cover-open) .wrap,
+body:not(.cover-open) .ref-sidebar,
+body:not(.cover-open) .ref-mobile-head{visibility:visible!important;pointer-events:auto!important}
+.cover.is-hidden{display:grid!important;opacity:0!important;visibility:hidden!important;pointer-events:none!important}
+
+@media(max-width:760px){
+  body.editorial-ui.home-index:not(.cover-open) .hero{
+    background-position:60% center!important;
+    background-image:linear-gradient(90deg,rgba(6,6,7,.88) 0%,rgba(7,7,8,.68) 48%,rgba(7,7,8,.42) 100%),url('hero-mic.jpg')!important;
+  }
+  body.editorial-ui.home-index:not(.cover-open) .hero h1{font-size:40px!important;line-height:1.04!important}
+  body.editorial-ui.home-index:not(.cover-open) .hero .lead{font-size:11px!important;line-height:1.75!important}
+  body.editorial-ui.home-index:not(.cover-open) .heroaside small{color:#fff!important}
+}
+@media(max-width:480px){
+  body.editorial-ui.home-index:not(.cover-open) .hero h1{font-size:37px!important}
+}
+</style>
 </body></html>
